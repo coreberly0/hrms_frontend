@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
      <div>
-      <h1>Get Ready guys</h1>
+      <h1>Get Ready guys..???</h1>
      </div>
     </div>
   );
