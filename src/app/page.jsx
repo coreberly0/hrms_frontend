@@ -1,11 +1,11 @@
-import Image from "next/image";
+import LoginPage from "./(auth)/login/page";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-     <div>
-      <h1>Get Ready guys..???</h1>
-     </div>
+    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+      <div className="">
+        <LoginPage />
+      </div>
     </div>
   );
 }
