@@ -13,7 +13,7 @@ const companyData = {
   employees: [
     { email: "emp1@techcorp.com", password: "1234", role: "employee" },
     { email: "emp2@techcorp.com", password: "1234", role: "employee" },
-    { email: "emp3@techcorp.com", password: "1234", role: "employee" },
+    { email: "kanigskanigs362@gmail.com", password: "1234", role: "employee" },
   ],
 }
 
