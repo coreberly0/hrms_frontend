@@ -7,8 +7,8 @@ const companyData = {
   superadmin: { email: "super@admin.com", password: "1234", role: "superadmin" },
   hrs: [
     { email: "hr1@techcorp.com", password: "1234", role: "hr" },
-    { email: "hr2@techcorp.com", password: "1234", role: "hr" },
-    { email: "hr3@techcorp.com", password: "1234", role: "hr" },
+    { email: "Charannks@gmail.com", password: "1234", role: "hr" },
+    { email: "reshmashanmugam1234@gmail.com", password: "1234", role: "hr" },
   ],
   employees: [
     { email: "emp1@techcorp.com", password: "1234", role: "employee" },
