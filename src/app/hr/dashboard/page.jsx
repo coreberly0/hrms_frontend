@@ -1,9 +1,11 @@
-import React from 'react'
+import { Suspense } from "react"
+import HrDashboardPage from "./HrDashboardClient"
 
-function page() {
+
+export default function Page() {
   return (
-    <div>hr</div>
+    <Suspense fallback={<div>Loading dashboard...</div>}>
+      <HrDashboardPage />
+    </Suspense>
   )
 }
-
-export default page
