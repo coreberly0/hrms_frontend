@@ -1,12 +1,12 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-
-import { HRBreadcrumb } from "@/components/common/HRBreadcrumb"
-import { HRSidebar } from "@/components/common/hr-sidebar"
-
+import { HRSidebar } from "@/components/common/hr-sidebar";
+import { HRBreadcrumb } from "@/components/common/HRBreadcrumb";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function HRLayout({ children }) {
   return (
-    <SidebarProvider>
+    <div>
+      {/* HR layout wrapper */}
+      <SidebarProvider>
       <HRSidebar />
     
       <main className="w-full p-4">
@@ -22,5 +22,6 @@ export default function HRLayout({ children }) {
         {children}
       </main>
     </SidebarProvider>
-  )
+    </div>
+  );
 }
