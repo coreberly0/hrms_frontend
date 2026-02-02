@@ -8,13 +8,14 @@ const companyData = {
   hrs: [
     { email: "kishorevijay0010@gmail.com", password: "1234", role: "hr" },
     { email: "Charannks@gmail.com", password: "1234", role: "hr" },
-    { email: "reshmashanmugam1234@gmail.com", password: "1234", role: "hr" },
+    
     
   ],
   employees: [
     { email: "emp1@techcorp.com", password: "1234", role: "employee" },
     { email: "emp2@techcorp.com", password: "1234", role: "employee" },
     { email: "kanigskanigs362@gmail.com", password: "1234", role: "employee" },
+    { email: "reshmashanmugam1234@gmail.com", password: "1234", role: "employee" },
   ],
 }
 
