@@ -57,7 +57,7 @@ export function HRSidebar() {
                          hover:bg-gray-400
                          data-[active=true]:bg-gray-500"
             >
-              <Link href="/hr/dashboard/employees.jsx">
+              <Link href="/hr/dashboard/employees">
                 <Users className="h-5 w-5" />
                 <span>Employees</span>
               </Link>
