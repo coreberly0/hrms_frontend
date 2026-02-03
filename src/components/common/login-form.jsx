@@ -16,7 +16,6 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
   FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -38,6 +37,19 @@ export function LoginForm({ className, ...props }) {
     },
   })
 
+  /* ---------------- FRONTEND VALIDATION ERROR ---------------- */
+  const onError = (errors) => {
+    if (errors.email) {
+      toast.error(errors.email.message)
+      return
+    }
+
+    if (errors.password) {
+      toast.error(errors.password.message)
+      return
+    }
+  }
+
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = async (data) => {
     try {
@@ -47,13 +59,18 @@ export function LoginForm({ className, ...props }) {
         body: JSON.stringify(data),
       })
 
-      const result = await res.json()
-
       if (!res.ok) {
-        toast.error(result.message || "Invalid credentials")
+        toast.error("Email or password is incorrect")
         return
       }
 
+      
+
+      const result = await res.json()
+
+      // ✅ SET COOKIE FOR MIDDLEWARE
+    document.cookie = `role=${result.role}; path=/`
+    
       toast.success("Login successful")
 
       if (result.role === "superadmin") {
@@ -78,15 +95,12 @@ export function LoginForm({ className, ...props }) {
   }
 
   return (
-    <div
-      className={cn("flex flex-col gap-6", className)}
-      {...props}
-    >
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form
             className="p-6 md:p-8 space-y-4"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, onError)}
           >
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
@@ -140,33 +154,12 @@ export function LoginForm({ className, ...props }) {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting
-                  ? "Logging in..."
-                  : "Login"}
+                {form.formState.isSubmitting ? "Logging in..." : "Login"}
               </Button>
-
-              {/* <FieldSeparator>
-                Or continue with
-              </FieldSeparator> */}
-
-              {/* <Field className="grid grid-cols-3 gap-4">
-                <Button variant="outline" type="button">
-                  Apple
-                </Button>
-                <Button variant="outline" type="button">
-                  Google
-                </Button>
-                <Button variant="outline" type="button">
-                  Meta
-                </Button>
-              </Field> */}
-
-              <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
-              </FieldDescription>
             </FieldGroup>
           </form>
 
+          {/* IMAGE */}
           <div className="bg-muted hidden md:block relative">
             <img
               src={sampleImg.src}
