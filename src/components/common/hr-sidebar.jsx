@@ -79,7 +79,6 @@ export function HRSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-
         </SidebarMenu>
       </SidebarContent>
     </Sidebar>

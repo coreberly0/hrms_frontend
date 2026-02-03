@@ -11,7 +11,7 @@ export default function EmployeeLayout({ children }) {
   const menuItems = [
     { name: 'Dashboard', href: '/employee/dashboard' },
     { name: 'Attendance', href: '/employee/attendance' },
-    { name: 'Payroll', href: '/employee/payroll' },
+    { name: 'Payslip', href: '/employee/payslip' },
     { name: 'Leave', href: '/employee/leave' },
     { name: 'Complaints', href: '/employee/complaints' },
     { name: 'Profile', href: '/employee/profile' },
