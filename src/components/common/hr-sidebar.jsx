@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   CalendarCheck,
-  ChevronRight,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -16,19 +15,22 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function HRSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+
+  // 🔥 Extract HR ID from URL → /hr/hr1/...
+  const hrId = pathname.split("/")[2];
+
+  if (!hrId) return null;
 
   return (
     <Sidebar className="bg-gray-300 text-black">
-      {/* Header */}
       <SidebarHeader className="text-xl font-bold px-4 py-3 border-b border-gray-400">
         HR Panel
       </SidebarHeader>
 
-      {/* Content */}
       <SidebarContent className="px-2 py-4">
         <SidebarMenu className="space-y-1">
 
@@ -36,14 +38,11 @@ export function HRSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname === "/hr/dashboard"}
-              className="flex items-center gap-3 px-4 py-2 rounded-md
-                         hover:bg-gray-400
-                         data-[active=true]:bg-gray-500"
+              isActive={pathname === `/hr/${hrId}`}
             >
-              <Link href="/hr/dashboard">
+              <Link href={`/hr/${hrId}`} className="flex gap-3 px-4 py-2">
                 <LayoutDashboard className="h-5 w-5" />
-                <span>Dashboard</span>
+                Dashboard
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -52,14 +51,11 @@ export function HRSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname.startsWith("/hr/dashboard/employees")}
-              className="flex items-center gap-3 px-4 py-2 rounded-md
-                         hover:bg-gray-400
-                         data-[active=true]:bg-gray-500"
+              isActive={pathname.startsWith(`/hr/${hrId}/employeeDetails`)}
             >
-              <Link href="/hr/dashboard/employees">
+              <Link href={`/hr/${hrId}/employeeDetails`} className="flex gap-3 px-4 py-2">
                 <Users className="h-5 w-5" />
-                <span>Employees</span>
+                Employees
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -68,19 +64,17 @@ export function HRSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname === "/hr/attendance"}
-              className="flex items-center gap-3 px-4 py-2 rounded-md
-                         hover:bg-gray-400
-                         data-[active=true]:bg-gray-500"
+              isActive={pathname.startsWith(`/hr/${hrId}/attendance`)}
             >
-              <Link href="/hr/attendance">
+              <Link href={`/hr/${hrId}/attendance`} className="flex gap-3 px-4 py-2">
                 <CalendarCheck className="h-5 w-5" />
-                <span>Attendance</span>
+                Attendance
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
         </SidebarMenu>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

@@ -66,9 +66,13 @@ export function LoginForm({ className, ...props }) {
 
       const result = await res.json();
 
+      // Save HR data in localStorage or context
+      localStorage.setItem("hrData", JSON.stringify(result));
+
       // ✅ SET COOKIE FOR MIDDLEWARE
       document.cookie = `role=${result.role}; path=/`;
       document.cookie = `name=${result.name}; path=/`;
+      document.cookie = `hrId=${result.id}; path=/`;
 
       toast.success("Login successful");
 
@@ -77,9 +81,7 @@ export function LoginForm({ className, ...props }) {
       }
 
       if (result.role === "hr") {
-        router.push(
-          `/hr/dashboard?companyId=${result.companyId}&companyName=${result.companyName}`,
-        );
+        router.push(`/hr/${result.id}`);
       }
 
       if (result.role === "employee") {
