@@ -119,7 +119,7 @@ export function LoginForm({ className, ...props }) {
                     <Input
                       {...field}
                       type="email"
-                      placeholder="email@company.com"
+                      placeholder="Enter the company email"
                     />
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
@@ -140,7 +140,11 @@ export function LoginForm({ className, ...props }) {
                         Forgot password?
                       </a>
                     </div>
-                    <Input {...field} type="password" />
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="Enter the password"
+                    />
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
                     )}
