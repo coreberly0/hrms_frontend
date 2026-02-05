@@ -1,34 +1,33 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import sampleImg from "@/components/asset/sample.jpg"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import sampleImg from "@/components/asset/sample.jpg";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
   FieldError,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 /* ---------------- VALIDATION ---------------- */
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(4, "Password must be at least 4 characters"),
-})
+});
 
 export function LoginForm({ className, ...props }) {
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -36,7 +35,20 @@ export function LoginForm({ className, ...props }) {
       email: "",
       password: "",
     },
-  })
+  });
+
+  /* ---------------- FRONTEND VALIDATION ERROR ---------------- */
+  const onError = (errors) => {
+    if (errors.email) {
+      toast.error(errors.email.message);
+      return;
+    }
+
+    if (errors.password) {
+      toast.error(errors.password.message);
+      return;
+    }
+  };
 
   /* ---------------- SUBMIT ---------------- */
   const onSubmit = async (data) => {
@@ -45,55 +57,56 @@ export function LoginForm({ className, ...props }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
-
-      const result = await res.json()
+      });
 
       if (!res.ok) {
-        toast.error(result.message || "Invalid credentials")
-        return
+        toast.error("Email or password is incorrect");
+        return;
       }
 
-      toast.success("Login successful")
+      const result = await res.json();
+
+      // Save HR data in localStorage or context
+      localStorage.setItem("hrData", JSON.stringify(result));
+
+      // ✅ SET COOKIE FOR MIDDLEWARE
+      document.cookie = `role=${result.role}; path=/`;
+      document.cookie = `name=${result.name}; path=/`;
+      document.cookie = `hrId=${result.id}; path=/`;
+
+      toast.success("Login successful");
 
       if (result.role === "superadmin") {
-        router.push("/superadmin/dashboard")
+        router.push("/superadmin/dashboard");
       }
 
       if (result.role === "hr") {
-        router.push(
-          `/hr/dashboard?companyId=${result.companyId}&companyName=${result.companyName}`
-        )
+        router.push(`/hr/${result.id}`);
       }
 
       if (result.role === "employee") {
         router.push(
-          `/employee/dashboard?companyId=${result.companyId}&companyName=${result.companyName}`
-        )
+          `/employee/dashboard?companyId=${result.companyId}&companyName=${result.companyName}`,
+        );
       }
     } catch (err) {
-      console.error(err)
-      toast.error("Server error, try again")
+      console.error(err);
+      toast.error("Server error, try again");
     }
-  }
+  };
 
   return (
-    <div
-      className={cn("flex flex-col gap-6", className)}
-      {...props}
-    >
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form
             className="p-6 md:p-8 space-y-4"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(onSubmit, onError)}
           >
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-muted-foreground">
-                  Login to your account
-                </p>
+                <p className="text-muted-foreground">Login to your account</p>
               </div>
 
               {/* EMAIL */}
@@ -140,33 +153,12 @@ export function LoginForm({ className, ...props }) {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting
-                  ? "Logging in..."
-                  : "Login"}
+                {form.formState.isSubmitting ? "Logging in..." : "Login"}
               </Button>
-
-              {/* <FieldSeparator>
-                Or continue with
-              </FieldSeparator> */}
-
-              {/* <Field className="grid grid-cols-3 gap-4">
-                <Button variant="outline" type="button">
-                  Apple
-                </Button>
-                <Button variant="outline" type="button">
-                  Google
-                </Button>
-                <Button variant="outline" type="button">
-                  Meta
-                </Button>
-              </Field> */}
-
-              <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
-              </FieldDescription>
             </FieldGroup>
           </form>
 
+          {/* IMAGE */}
           <div className="bg-muted hidden md:block relative">
             <img
               src={sampleImg.src}
@@ -178,9 +170,9 @@ export function LoginForm({ className, ...props }) {
       </Card>
 
       <FieldDescription className="text-center px-6">
-        By clicking continue, you agree to our{" "}
-        <a href="#">Terms</a> & <a href="#">Privacy Policy</a>
+        By clicking continue, you agree to our <a href="#">Terms</a> &{" "}
+        <a href="#">Privacy Policy</a>
       </FieldDescription>
     </div>
-  )
+  );
 }
