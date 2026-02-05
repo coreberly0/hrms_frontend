@@ -1,10 +1,15 @@
+"use client"
+
+import Sidebar from "../Sidebar"
+
 export default function AttendancePage() {
   return (
-    <div>
-      <h1 style={{ color: '#1C225B' }}>Attendance</h1>
-      <p>View and manage your attendance records.</p>
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar />
+      <div className="flex-1 ml-64 p-6">
+        <h1 className="text-2xl font-bold text-[#1C225B]">Attendance</h1>
+        {/* Your attendance content */}
+      </div>
     </div>
-  );
+  )
 }
-
-
