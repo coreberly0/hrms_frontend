@@ -25,6 +25,16 @@ import {
   FormControl,
   FormMessage
 } from "@/components/ui/form"
+import { indianStates, indianCities } from "@/data/indianLocations"
+
+import { 
+  skillSetOptions,
+  departmentOptions,
+  experienceOptions,
+  sourceOfHireOptions,
+  qualificationOptions
+} from "@/data/professionalOptions"
+
 
 import Sidebar from "../Sidebar"
 
@@ -41,218 +51,10 @@ export default function EmployeeProfilePage() {
   const [experienceLevel, setExperienceLevel] = useState("")
   const [showOtherSkill, setShowOtherSkill] = useState(false)
   const [showOtherDepartment, setShowOtherDepartment] = useState(false)
+  const [selectedSkills, setSelectedSkills] = useState([])
   const [educationOtherQualification, setEducationOtherQualification] = useState({})
 
-  // Indian States
-  const indianStates = [
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chhattisgarh",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal"
-  ]
-
-  // Major Indian Cities
-  const indianCities = [
-    "Mumbai",
-    "Delhi",
-    "Bangalore",
-    "Hyderabad",
-    "Ahmedabad",
-    "Chennai",
-    "Kolkata",
-    "Surat",
-    "Pune",
-    "Jaipur",
-    "Lucknow",
-    "Kanpur",
-    "Nagpur",
-    "Indore",
-    "Thane",
-    "Bhopal",
-    "Visakhapatnam",
-    "Pimpri-Chinchwad",
-    "Patna",
-    "Vadodara",
-    "Ghaziabad",
-    "Ludhiana",
-    "Agra",
-    "Nashik",
-    "Faridabad",
-    "Meerut",
-    "Rajkot",
-    "Kalyan-Dombivali",
-    "Vasai-Virar",
-    "Varanasi",
-    "Srinagar",
-    "Aurangabad",
-    "Dhanbad",
-    "Amritsar",
-    "Navi Mumbai",
-    "Allahabad",
-    "Ranchi",
-    "Howrah",
-    "Coimbatore",
-    "Jabalpur",
-    "Gwalior",
-    "Vijayawada",
-    "Jodhpur",
-    "Madurai",
-    "Raipur",
-    "Kota"
-  ]
-
-  // Experience Options
-  const experienceOptions = [
-    "0-2 years",
-    "2 years",
-    "3 years",
-    "More than 3 years"
-  ]
-
-  // Source of Hire Options
-  const sourceOfHireOptions = [
-    "Job Boards",
-    "Employee Referrals",
-    "LinkedIn",
-    "Staffing Agencies",
-    "Instagram",
-    "Official Website",
-    "Others"
-  ]
-
-  // Skill Set Options
-  const skillSetOptions = [
-    "Software & Programming - C, C++, Java, Python",
-    "Software & Programming - JavaScript, TypeScript",
-    "Software & Programming - HTML, CSS",
-    "Software & Programming - React.js, Next.js, Angular",
-    "Software & Programming - Node.js, Express.js",
-    "Data & Analytics - SQL, MySQL, PostgreSQL",
-    "Data & Analytics - MongoDB",
-    "Data & Analytics - Excel (Advanced)",
-    "Data & Analytics - Power BI, Tableau",
-    "Data & Analytics - Data Visualization",
-    "Data & Analytics - Basic Machine Learning",
-    "Cloud & DevOps - AWS, Azure, Google Cloud",
-    "Cloud & DevOps - Docker, Kubernetes",
-    "Cloud & DevOps - CI/CD pipelines",
-    "Cloud & DevOps - Linux",
-    "Cloud & DevOps - Git, GitHub",
-    "AI & Machine Learning - Python for AI",
-    "AI & Machine Learning - TensorFlow, PyTorch",
-    "AI & Machine Learning - NLP (Text Processing)",
-    "AI & Machine Learning - Computer Vision",
-    "AI & Machine Learning - Model Training & Evaluation",
-    "Web & App Development - Full Stack Development",
-    "Web & App Development - REST APIs",
-    "Web & App Development - Responsive Design",
-    "Web & App Development - Flutter, React Native",
-    "Web & App Development - UI/UX Basics",
-    "Cybersecurity - Network Security",
-    "Cybersecurity - Ethical Hacking (Basics)",
-    "Cybersecurity - Penetration Testing",
-    "Cybersecurity - Encryption",
-    "Cybersecurity - Security Audits",
-    "Networking - TCP/IP",
-    "Networking - DNS",
-    "Networking - Routing & Switching",
-    "Networking - Network Troubleshooting",
-    "Database & Backend - Database Design",
-    "Database & Backend - Stored Procedures",
-    "Database & Backend - ORM (Prisma, Sequelize)",
-    "Database & Backend - API Development",
-    "Testing & QA - Manual Testing",
-    "Testing & QA - Automation Testing (Selenium, Cypress)",
-    "Testing & QA - Unit Testing",
-    "Other Technical Skills - Version Control (Git)",
-    "Other Technical Skills - Agile & Scrum",
-    "Other Technical Skills - Software Documentation",
-    "Other Technical Skills - System Design (Basics)",
-    "Others"
-  ]
-
-  // Department Options
-  const departmentOptions = [
-    "Information Technology",
-    "Finance & Accounting",
-    "Sales",
-    "Marketing",
-    "Operations",
-    "Administration",
-    "Software Development",
-    "Product Management",
-    "Quality Assurance",
-    "Research & Development",
-    "Data Science & Analytics",
-    "Cybersecurity",
-    "Cloud & Infrastructure",
-    "Customer Support",
-    "Technical Support",
-    "Help Desk",
-    "Procurement / Purchasing",
-    "Supply Chain Management",
-    "Logistics & Warehouse",
-    "Business Development",
-    "Corporate Strategy",
-    "Project Management",
-    "Legal Affairs",
-    "Compliance",
-    "Risk Management",
-    "Training & Development",
-    "Talent Acquisition",
-    "Design (UI/UX, Graphic Design)",
-    "Content & Media Production",
-    "Public Relations",
-    "Manufacturing",
-    "Healthcare Services",
-    "Education & Training",
-    "Banking & Financial Services",
-    "Others"
-  ]
-
-  // Qualification Options
-  const qualificationOptions = [
-    "High School / Higher Secondary Certificate",
-    "Diploma (Technical / Professional)",
-    "Bachelor's Degree (B.E, B.Tech, B.Sc, B.Com, BBA, BA)",
-    "Master's Degree (M.E, M.Tech, M.Sc, MBA, MCA, MA)",
-    "Doctorate / PhD",
-    "Postgraduate Diploma",
-    "Professional Certifications (IT, Cloud, Data, Security, etc.)",
-    "Skill-based Certifications (Programming, Design, Testing)",
-    "Industry Training Programs",
-    "Apprenticeship / Internship Experience",
-    "Technical Skills (Software, Tools, Programming Languages)",
-    "Analytical & Problem-Solving Skills",
-    "Communication Skills",
-    "Leadership Skills",
-    "Team Collaboration Skills",
-    "Others"
-  ]
+ 
 
   // Generate year options (current year to 50 years back)
   const generateYearOptions = () => {
@@ -264,67 +66,42 @@ export default function EmployeeProfilePage() {
     return years
   }
 
-  const form = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      gender: "",
-      dateOfBirth: "",
-      age: "",
-      email: "",
-      phone: "",
-      alternativePhone: "",
-      maritalStatus: "",
-      
-      // Spouse Details
-      spouseName: "",
-      spouseMobile: "",
-      
-      // Parent Details
-      parentName: "",
-      parentMobile: "",
-      parentRelation: "",
-
-      // Present Address
-      presentDoorNo: "",
-      presentStreet: "",
-      presentArea: "",
-      presentLocation: "",
-      presentCity: "",
-      presentState: "",
-      presentPincode: "",
-
-      // Permanent Address
-      permanentDoorNo: "",
-      permanentStreet: "",
-      permanentArea: "",
-      permanentLocation: "",
-      permanentCity: "",
-      permanentState: "",
-      permanentPincode: "",
-
-      experience: "",
-      experienceYears: "",
-      sourceOfHire: "",
-      skillSet: "",
-      otherSkillSet: "",
-      department: "",
-      otherDepartment: "",
-      title: "",
-
-      // Bank Details
-      accountNumber: "",
-      bankName: "",
-      branch: "",
-      ifscCode: "",
-
-      // Identification Details
-      uanNumber: "",
-      panNumber: "",
-      aadharNumber: ""
-    }
-  })
-
+ const form = useForm({
+  defaultValues: {
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dateOfBirth: "",
+    age: "",
+    email: "",
+    phone: "",
+    alternativePhone: "",
+    maritalStatus: "",
+    
+    // Spouse Details - ADD THESE
+    spouseName: "",
+    spouseMobile: "",
+    
+    // Parent Details - ADD THESE
+    parentName: "",
+    parentMobile: "",
+    parentRelation: "",
+    
+    // ... rest of your fields
+    
+    // Education fields - ADD THESE
+    qualification_0: "",
+    otherQualification_0: "",
+    degree_0: "",
+    institution_0: "",
+    fieldOfStudy_0: "",
+    yearOfPassing_0: "",
+    grade_0: "",
+    
+    // Add other skill set fields
+    otherSkillSetText: "",
+  }
+})
   useEffect(() => {
     setMounted(true)
 
@@ -469,7 +246,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">Gender <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -609,7 +386,7 @@ export default function EmployeeProfilePage() {
                             field.onChange(value)
                             setMaritalStatus(value)
                           }} 
-                          value={field.value}
+                          value={field.value ||""}
                           disabled={showViewOnly}
                           required
                         >
@@ -698,7 +475,7 @@ export default function EmployeeProfilePage() {
                             </FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              value={field.value}
+                              value={field.value ||""}
                               disabled={showViewOnly}
                               required
                             >
@@ -845,7 +622,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">City <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -874,7 +651,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">State <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -991,7 +768,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">City <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -1020,7 +797,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">State <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -1085,7 +862,7 @@ export default function EmployeeProfilePage() {
                             field.onChange(value)
                             setExperienceLevel(value)
                           }} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -1139,7 +916,7 @@ export default function EmployeeProfilePage() {
                         <FormLabel className="text-sm">Source of Hire <span className="text-red-500">*</span></FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          value={field.value}
+                          value={field.value||""}
                           required
                         >
                           <FormControl>
@@ -1161,59 +938,152 @@ export default function EmployeeProfilePage() {
                   />
 
                   {/* Skill Set */}
-                  <FormField
-                    control={form.control}
-                    name="skillSet"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel className="text-sm">Skill Set <span className="text-red-500">*</span></FormLabel>
-                        <Select 
-                          onValueChange={(value) => {
-                            field.onChange(value)
-                            setShowOtherSkill(value === "Others")
-                          }} 
-                          value={field.value}
-                          required
-                        >
-                          <FormControl>
-                            <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Select skill set" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="max-h-[300px]">
-                            {skillSetOptions.map((skill) => (
-                              <SelectItem key={skill} value={skill}>
-                                {skill}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+{/* Skill Set */}
+<FormField
+  control={form.control}
+  name="skillSet"
+  render={({ field }) => (
+    <FormItem className="space-y-1 relative">
+      <FormLabel className="text-sm">
+        Skill Set <span className="text-red-500">*</span>
+      </FormLabel>
+      
+      {/* Selected Skills Display - looks like a normal dropdown */}
+      <div 
+        className="h-9 border rounded-md px-3 py-2 cursor-pointer bg-white hover:border-gray-400 transition flex items-center justify-between"
+        onClick={() => setShowOtherSkill(!showOtherSkill)}
+      >
+        <div className="flex-1 overflow-hidden">
+          {selectedSkills.length === 0 ? (
+            <span className="text-gray-400 text-sm">Select skills</span>
+          ) : (
+            <div className="flex flex-wrap gap-1">
+              {selectedSkills.map((skill) => (
+                <span 
+                  key={skill}
+                  className="inline-flex items-center gap-1 bg-[#1C225B] text-white px-2 py-0.5 rounded text-xs"
+                >
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const updatedSkills = selectedSkills.filter(s => s !== skill)
+                      setSelectedSkills(updatedSkills)
+                      form.setValue("skillSet", updatedSkills)
+                    }}
+                    className="hover:bg-white/20 rounded-full w-3 h-3 flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <svg 
+          className={`w-4 h-4 transition-transform ${showOtherSkill ? 'rotate-180' : ''}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
 
-                  {/* Other Skill Set (shown when "Others" is selected) */}
-                  {showOtherSkill && (
-                    <FormField
-                      control={form.control}
-                      name="otherSkillSet"
-                      render={({ field }) => (
-                        <FormItem className="space-y-1">
-                          <FormLabel className="text-sm">Specify Other Skill <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              className="h-9"
-                              placeholder="Enter your skill"
-                              required
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
+      {/* Dropdown Checkbox List - Absolute positioned overlay */}
+      {showOtherSkill && (
+        <>
+          {/* Backdrop to close dropdown when clicking outside */}
+          <div 
+            className="fixed inset-0 z-40"
+            onClick={() => setShowOtherSkill(false)}
+          />
+          
+          {/* Dropdown content */}
+          <div className="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-[300px] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2 p-3">
+              {skillSetOptions.map((skill) => (
+                <label 
+                  key={skill} 
+                  className="flex items-center gap-2 text-sm hover:bg-gray-50 p-2 rounded cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    value={skill}
+                    checked={selectedSkills.includes(skill)}
+                    onChange={(e) => {
+                      let updatedSkills
+                      if (e.target.checked) {
+                        updatedSkills = [...selectedSkills, skill]
+                      } else {
+                        updatedSkills = selectedSkills.filter(s => s !== skill)
+                      }
+                      setSelectedSkills(updatedSkills)
+                      form.setValue("skillSet", updatedSkills)
+                    }}
+                    className="cursor-pointer w-4 h-4"
+                  />
+                  {skill}
+                </label>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+{/* Other Skills - Always visible dropdown */}
+<FormField
+  control={form.control}
+  name="otherSkillSet"
+  render={({ field }) => (
+    <FormItem className="space-y-1">
+      <FormLabel className="text-sm">Other Skills</FormLabel>
+      <Select 
+        onValueChange={field.onChange} 
+        value={field.value ||""}
+      >
+        <FormControl>
+          <SelectTrigger className="h-9">
+            <SelectValue placeholder="Select option" />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          <SelectItem value="N/A">N/A</SelectItem>
+          <SelectItem value="Other">Mention Other Skills</SelectItem>
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+{/* Text input for other skills - shown when "Other" is selected */}
+{form.watch("otherSkillSet") === "Other" && (
+  <FormField
+    control={form.control}
+    name="otherSkillSetText"
+    render={({ field }) => (
+      <FormItem className="space-y-1 md:col-span-2">
+        <FormLabel className="text-sm">Specify Other Skills <span className="text-red-500">*</span></FormLabel>
+        <FormControl>
+          <Input 
+            {...field} 
+            className="h-9"
+            placeholder="Enter your other skills"
+            required
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)}
 
                   {/* Department */}
                   <FormField
@@ -1227,7 +1097,7 @@ export default function EmployeeProfilePage() {
                             field.onChange(value)
                             setShowOtherDepartment(value === "Others")
                           }} 
-                          value={field.value}
+                          value={field.value ||""}
                           required
                         >
                           <FormControl>
@@ -1518,7 +1388,7 @@ export default function EmployeeProfilePage() {
                                   [index]: value === "Others"
                                 })
                               }} 
-                              value={field.value}
+                              value={field.value||""}
                               required
                             >
                               <FormControl>
@@ -1610,7 +1480,7 @@ export default function EmployeeProfilePage() {
                             <FormLabel className="text-sm">Year of Passing <span className="text-red-500">*</span></FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              value={field.value}
+                              value={field.value ||""}
                               required
                             >
                               <FormControl>
