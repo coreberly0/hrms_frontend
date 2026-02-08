@@ -7,7 +7,7 @@ const employeeLogs = [
 
     // 🪪 EMPLOYEE INFO
     employeeCode: "EMP-39394",
-    employeeName: "Arun Kumar",
+    employeeName: "Kishore",
     gender: "Male",
     maritalStatus: "Married",
 
@@ -43,15 +43,15 @@ const employeeLogs = [
   },
 
   {
-    id: "emp1",
+    id: "emp2",
     employeeCode: "EMP-39394",
-    employeeName: "Arun Kumar",
-    gender: "Male",
-    maritalStatus: "Married",
+    employeeName: "Reshma",
+    gender: "Female",
+    maritalStatus: "UnMarried",
 
     personalPhone: "9876543210",
     alternatePhone: "9123456789",
-    email: "arun.kumar@techcorp.com",
+    email: "reshmashanmugam1234@gmail.com",
 
     address: {
       doorNo: "12A",
@@ -78,7 +78,7 @@ const employeeLogs = [
 
   // 👇 Another employee
   {
-    id: "emp2",
+    id: "emp3",
     employeeCode: "EMP-40211",
     employeeName: "Bala Murugan",
     gender: "Male",
