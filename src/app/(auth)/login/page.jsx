@@ -1,4 +1,5 @@
-import { LoginForm } from '@/components/common/login-form'
+"use client";
+import LoginForm from '@/components/common/login-form';
 import React from 'react'
 
 

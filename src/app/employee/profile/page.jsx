@@ -36,7 +36,7 @@ import {
 } from "@/data/professionalOptions"
 
 
-import Sidebar from "../Sidebar"
+import Sidebar from "../EmpSidebar"
 
 export default function EmployeeProfilePage() {
   const searchParams = useSearchParams()

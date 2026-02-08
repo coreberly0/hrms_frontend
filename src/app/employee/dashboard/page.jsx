@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import Sidebar from "../Sidebar"
+
 
 function EmployeeDashboardClient() {
 
@@ -173,12 +173,12 @@ function EmployeeDashboardClient() {
   )
 }
 
-export default function Page() {
+export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-gray-100">
 
       {/* Sidebar */}
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       {/* Main Dashboard Area */}
       <div className="flex-1">

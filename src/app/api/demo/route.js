@@ -13,7 +13,7 @@ const companyData = {
   hrs: [
     {
       id: "hr1",
-      email: "kishorevijay0010@gmail.com",
+      email: "",
       password: "1234",
       role: "hr",
       name: "Kishore V",
@@ -43,7 +43,7 @@ const companyData = {
   employees: [
     {
       id: "emp1",
-      email: "emp1@techcorp.com",
+      email: "kishorevijay0010@gmail.com",
       password: "1234",
       role: "employee",
       name: "Dinesh",

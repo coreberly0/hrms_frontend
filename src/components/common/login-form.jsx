@@ -26,7 +26,7 @@ const loginSchema = z.object({
   password: z.string().min(4, "Password must be at least 4 characters"),
 });
 
-export function LoginForm({ className, ...props }) {
+export default function LoginForm({ className, ...props }) {
   const router = useRouter();
 
   const form = useForm({
@@ -73,6 +73,7 @@ export function LoginForm({ className, ...props }) {
       document.cookie = `role=${result.role}; path=/`;
       document.cookie = `name=${result.name}; path=/`;
       document.cookie = `hrId=${result.id}; path=/`;
+      document.cookie = `userId=${result.id}; path=/`;
 
       toast.success("Login successful");
 
@@ -85,9 +86,7 @@ export function LoginForm({ className, ...props }) {
       }
 
       if (result.role === "employee") {
-        router.push(
-          `/employee/dashboard?companyId=${result.companyId}&companyName=${result.companyName}`,
-        );
+        router.push(`/employee/${result.id}`);
       }
     } catch (err) {
       console.error(err);

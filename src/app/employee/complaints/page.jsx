@@ -1,6 +1,6 @@
 "use client"
 
-import Sidebar from "../Sidebar"
+import Sidebar from "../EmpSidebar"
 
 export default function ComplaintsPage() {
   return (
