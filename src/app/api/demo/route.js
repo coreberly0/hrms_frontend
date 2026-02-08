@@ -27,14 +27,14 @@ const companyData = {
     },
     {
       id: "hr3",
-      email: "reshmashanmugam1234@gmail.com",
+      email: "reshmashanmugam12344@gmail.com",
       password: "1234",
       role: "hr",
       name: "Reshma",
     },
     {
       id: "hr4",
-      email: "kanigskanigs362@gmail.com",
+      email: "kanigskanigs3622@gmail.com",
       password: "1234",
       role: "hr",
       name: "Kani",
@@ -50,10 +50,17 @@ const companyData = {
     },
     {
       id: "emp2",
-      email: "emp2@techcorp.com",
+      email: "reshmashanmugam1234@gmail.com",
       password: "1234",
       role: "employee",
       name: "Reshma",
+    },
+     {
+      id: "emp3",
+      email: "kanigskanigs362@gmail.com",
+      password: "1234",
+      role: "employee",
+      name: "Kani",
     },
   ],
 };
