@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   CalendarPlus,
   ClipboardList,
+  CalendarCheck,
+  FileText,
 } from "lucide-react";
 
 import {
@@ -64,6 +66,42 @@ export function EmpSidebar() {
               >
                 <CalendarPlus className="h-5 w-5" />
                 Apply Leave
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Attendance */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(
+                `/employee/${empId}/attendance`
+              )}
+            >
+              <Link
+                href={`/employee/${empId}/attendance`}
+                className="flex gap-3 px-4 py-2"
+              >
+                <CalendarCheck className="h-5 w-5" />
+                Attendance
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Payslip */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(
+                `/employee/${empId}/id/payslip`
+              )}
+            >
+              <Link
+                href={`/employee/${empId}/id/payslip`}
+                className="flex gap-3 px-4 py-2"
+              >
+                <FileText className="h-5 w-5" />
+                Payslip
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
