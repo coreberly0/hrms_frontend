@@ -1,8 +1,9 @@
 "use client";
-
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Eye, Download, Share2, Mail, MessageCircle, X } from "lucide-react";
+import { Eye, Download, Share2, Mail, X } from "lucide-react";
 
 const MONTHS = [
 	"January",
@@ -26,19 +27,232 @@ const YEARS = Array.from(
 	(_, index) => CURRENT_YEAR - index
 );
 
+function buildPayslipData(employeeData, month, year, options = {}) {
+	const companyDetailsEmpty = options.companyDetailsEmpty ?? false;
+
+	return {
+		companyName: companyDetailsEmpty
+			? ""
+			: employeeData?.companyName || "Company Name",
+		companyAddress: companyDetailsEmpty ? "" : "Company Address",
+		cityPincode: companyDetailsEmpty ? "" : "City, Pincode",
+		country: companyDetailsEmpty ? "" : "India",
+		employeeName: employeeData?.employeeName || "N/A",
+		employeeId: employeeData?.employeeCode || "N/A",
+		payPeriod: `${month} ${year}`,
+		paidDays: "22",
+		lossOfPayDays: "0",
+		payDate: "Feb 01 2026",
+		earnings: [
+			{
+				label: "Basic",
+				amount: employeeData?.salary ? Math.round(employeeData.salary * 0.5) : 0,
+			},
+			{
+				label: "House Rent Allowance",
+				amount: employeeData?.salary ? Math.round(employeeData.salary * 0.3) : 0,
+			},
+		],
+		deductions: [
+			{
+				label: "Income Tax",
+				amount: employeeData?.salary ? Math.round(employeeData.salary * 0.1) : 0,
+			},
+			{
+				label: "Provident Fund",
+				amount: employeeData?.salary ? Math.round(employeeData.salary * 0.12) : 0,
+			},
+		],
+	};
+}
+
+function generatePayslipPDF({ employeeData, month, year, companyDetailsEmpty }) {
+	const payslipData = buildPayslipData(employeeData, month, year, {
+		companyDetailsEmpty,
+	});
+
+	const grossEarnings = payslipData.earnings.reduce(
+		(sum, item) => sum + item.amount,
+		0
+	);
+	const totalDeductions = payslipData.deductions.reduce(
+		(sum, item) => sum + item.amount,
+		0
+	);
+	const netPayable = grossEarnings - totalDeductions;
+
+	const formatCurrency = (value) => `INR ${value.toLocaleString("en-IN")}`;
+
+	const doc = new jsPDF();
+	const left = 14;
+	let currentY = 18;
+
+	doc.setFontSize(18);
+	doc.setFont("helvetica", "bold");
+	doc.text("PAYSLIP", left, currentY);
+
+	doc.setFontSize(11);
+	doc.setFont("helvetica", "normal");
+	currentY += 8;
+
+	if (payslipData.companyName) {
+		doc.setFont("helvetica", "bold");
+		doc.text(payslipData.companyName, left, currentY);
+		doc.setFont("helvetica", "normal");
+		currentY += 5;
+	}
+
+	const addressLines = [
+		payslipData.companyAddress,
+		payslipData.cityPincode,
+		payslipData.country,
+	].filter(Boolean);
+	addressLines.forEach((line) => {
+		doc.text(line, left, currentY);
+		currentY += 5;
+	});
+
+	currentY += 4;
+	doc.setFont("helvetica", "bold");
+	doc.text(`Payslip for ${payslipData.payPeriod}`, left, currentY);
+	doc.setFont("helvetica", "normal");
+	currentY += 8;
+
+	autoTable(doc, {
+		startY: currentY,
+		theme: "grid",
+		head: [["Employee Details", ""]],
+		body: [
+			["Employee Name", payslipData.employeeName],
+			["Employee ID", payslipData.employeeId],
+			["Pay Period", payslipData.payPeriod],
+			["Pay Date", payslipData.payDate],
+			["Paid Days", payslipData.paidDays],
+			["Loss of Pay Days", payslipData.lossOfPayDays],
+			["Department", employeeData?.department || "-"],
+			["Designation", employeeData?.designation || "-"],
+		],
+		headStyles: {
+			fillColor: [238, 238, 238],
+			textColor: 20,
+			fontStyle: "bold",
+		},
+		styles: { fontSize: 10, cellPadding: 3 },
+		columnStyles: { 0: { cellWidth: 45 } },
+	});
+
+	const tableTop = doc.lastAutoTable.finalY + 8;
+	autoTable(doc, {
+		startY: tableTop,
+		theme: "grid",
+		head: [["Earnings", "Amount"]],
+		body: [
+			...payslipData.earnings.map((item) => [
+				item.label,
+				formatCurrency(item.amount),
+			]),
+			["Gross Earnings", formatCurrency(grossEarnings)],
+		],
+		headStyles: {
+			fillColor: [238, 238, 238],
+			textColor: 20,
+			fontStyle: "bold",
+		},
+		styles: { fontSize: 10, cellPadding: 3 },
+		columnStyles: { 1: { halign: "right", cellWidth: 50 } },
+	});
+
+	autoTable(doc, {
+		startY: doc.lastAutoTable.finalY + 8,
+		theme: "grid",
+		head: [["Deductions", "Amount"]],
+		body: [
+			...payslipData.deductions.map((item) => [
+				item.label,
+				formatCurrency(item.amount),
+			]),
+			["Total Deductions", formatCurrency(totalDeductions)],
+		],
+		headStyles: {
+			fillColor: [238, 238, 238],
+			textColor: 20,
+			fontStyle: "bold",
+		},
+		styles: { fontSize: 10, cellPadding: 3 },
+		columnStyles: { 1: { halign: "right", cellWidth: 50 } },
+	});
+
+	const netPayTop = doc.lastAutoTable.finalY + 12;
+	doc.setFillColor(245, 247, 250);
+	doc.rect(left, netPayTop, 182, 16, "F");
+	doc.setFont("helvetica", "bold");
+	doc.text("Total Net Payable", left + 4, netPayTop + 10);
+	doc.text(formatCurrency(netPayable), left + 170, netPayTop + 10, {
+		align: "right",
+	});
+
+	doc.setFont("helvetica", "normal");
+	doc.setFontSize(9);
+	doc.text(
+		"Total Net Payable = Gross Earnings - Total Deductions",
+		left,
+		netPayTop + 22
+	);
+
+	const fileName = `${month}-${year}-Payslip.pdf`;
+	doc.save(fileName);
+}
+
 export default function PayslipPage() {
 	const [year, setYear] = useState(2025);
 	const [shareMenuOpen, setShareMenuOpen] = useState(null);
 	const [viewingPayslip, setViewingPayslip] = useState(null);
+	const params = useParams();
+	const employeeId = params.employeeid;
+	const [employeeData, setEmployeeData] = useState(null);
+	const [loadingEmployee, setLoadingEmployee] = useState(true);
+
+	useEffect(() => {
+		if (!employeeId) return;
+
+		async function fetchEmployeeData() {
+			try {
+				const res = await fetch(`/api/employees/${employeeId}`);
+				const data = await res.json();
+				if (data && data.length > 0) {
+					setEmployeeData(data[0]);
+				}
+			} catch (error) {
+				console.error("Error fetching employee data:", error);
+			} finally {
+				setLoadingEmployee(false);
+			}
+		}
+
+		fetchEmployeeData();
+	}, [employeeId]);
 
 	const handleView = (month, year) => {
 		setViewingPayslip({ month, year });
 	};
 
 	const handleDownload = (month, year) => {
-		// Placeholder: Generate PDF download
-		alert(`Downloading ${month} ${year} payslip as PDF...`);
-		// In production: trigger actual PDF download API
+		if (loadingEmployee) {
+			alert("Payslip data is still loading. Please try again in a moment.");
+			return;
+		}
+
+		if (!employeeData) {
+			alert("Employee data not found.");
+			return;
+		}
+
+		generatePayslipPDF({
+			employeeData,
+			month,
+			year,
+			companyDetailsEmpty: false,
+		});
 	};
 
 	const handleShare = (platform, month, year) => {
@@ -50,10 +264,6 @@ export default function PayslipPage() {
 				`mailto:?subject=Payslip - ${month} ${year}&body=${encodeURIComponent(
 					message + "\n" + url
 				)}`
-			);
-		} else if (platform === "whatsapp") {
-			window.open(
-				`https://wa.me/?text=${encodeURIComponent(message + " " + url)}`
 			);
 		}
 
@@ -68,6 +278,8 @@ export default function PayslipPage() {
 			})),
 		[year]
 	);
+
+	
 
 	return (
 		<div className="p-6 space-y-6">
@@ -153,16 +365,6 @@ export default function PayslipPage() {
 											<Mail className="h-4 w-4" />
 											Email
 										</button>
-										<button
-											type="button"
-											onClick={() =>
-												handleShare("whatsapp", card.month, card.year)
-											}
-											className="flex w-full items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-b-lg"
-										>
-											<MessageCircle className="h-4 w-4" />
-											WhatsApp
-										</button>
 									</div>
 								)}
 							</div>
@@ -176,40 +378,16 @@ export default function PayslipPage() {
 					month={viewingPayslip.month}
 					year={viewingPayslip.year}
 					onClose={() => setViewingPayslip(null)}
+					employeeData={employeeData}
+					loadingEmployee={loadingEmployee}
 				/>
 			)}
 		</div>
 	);
 }
 
-function PayslipModal({ month, year, onClose }) {
-	const params = useParams();
-	const employeeId = params.employeeid;
-	
-	const [employeeData, setEmployeeData] = useState(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		if (!employeeId) return;
-		
-		async function fetchEmployeeData() {
-			try {
-				const res = await fetch(`/api/employees/${employeeId}`);
-				const data = await res.json();
-				if (data && data.length > 0) {
-					setEmployeeData(data[0]);
-				}
-			} catch (error) {
-				console.error('Error fetching employee data:', error);
-			} finally {
-				setLoading(false);
-			}
-		}
-		
-		fetchEmployeeData();
-	}, [employeeId]);
-
-	if (loading) {
+function PayslipModal({ month, year, onClose, employeeData, loadingEmployee }) {
+	if (loadingEmployee) {
 		return (
 			<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 				<div className="bg-white rounded-lg p-8">
@@ -230,26 +408,7 @@ function PayslipModal({ month, year, onClose }) {
 		);
 	}
 
-	const payslipData = {
-		companyName: employeeData.companyName || "Company Name",
-		companyAddress: "Company Address",
-		cityPincode: "City, Pincode",
-		country: "India",
-		employeeName: employeeData.employeeName || "N/A",
-		employeeId: employeeData.employeeCode || "N/A",
-		payPeriod: `${month} ${year}`,
-		paidDays: "22",
-		lossOfPayDays: "0",
-		payDate: "Feb 01 2026",
-		earnings: [
-			{ label: "Basic", amount: employeeData.salary ? Math.round(employeeData.salary * 0.5) : 0 },
-			{ label: "House Rent Allowance", amount: employeeData.salary ? Math.round(employeeData.salary * 0.3) : 0 },
-		],
-		deductions: [
-			{ label: "Income Tax", amount: employeeData.salary ? Math.round(employeeData.salary * 0.1) : 0 },
-			{ label: "Provident Fund", amount: employeeData.salary ? Math.round(employeeData.salary * 0.12) : 0 },
-		],
-	};
+	const payslipData = buildPayslipData(employeeData, month, year);
 
 	const grossEarnings = payslipData.earnings.reduce(
 		(sum, item) => sum + item.amount,
@@ -261,27 +420,49 @@ function PayslipModal({ month, year, onClose }) {
 	);
 	const netPayable = grossEarnings - totalDeductions;
 
+	const generatePDF = () => {
+		generatePayslipPDF({
+			employeeData,
+			month,
+			year,
+			companyDetailsEmpty: false,
+		});
+	};
+
+
 	return (
 		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 			<div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
 				{/* Header */}
-				<div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-					<h2 className="text-xl font-semibold text-slate-800">
-						Payslip - {month} {year}
-					</h2>
-					<button
-						onClick={onClose}
-						className="p-1 hover:bg-slate-100 rounded-md transition"
-					>
-						<X className="h-5 w-5" />
-					</button>
-				</div>
+				
+<div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+	<h2 className="text-xl font-semibold text-slate-800">
+		Payslip - {month} {year}
+	</h2>
+
+	<div className="flex items-center gap-3">
+		<button
+			onClick={generatePDF}
+			className="px-3 py-1 bg-slate-900 text-white rounded-md text-sm"
+		>
+			Download PDF
+		</button>
+
+		<button
+			onClick={onClose}
+			className="p-1 hover:bg-slate-100 rounded-md transition"
+		>
+			<X className="h-5 w-5" />
+		</button>
+	</div>
+</div>
+
 
 				{/* Content */}
 				<div className="p-6 space-y-6">
 					{/* Company Details */}
 					<div className="space-y-2 text-slate-600">
-						<p className="font-medium text-slate-800">{payslipData.companyName}*</p>
+						<p className="font-medium text-slate-800">{payslipData.companyName}</p>
 						<p>{payslipData.companyAddress}</p>
 						<p>{payslipData.cityPincode}</p>
 						<p>{payslipData.country}</p>

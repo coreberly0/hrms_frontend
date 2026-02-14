@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function EmployeeDashboard({ employeeid }) {
@@ -87,6 +88,17 @@ export default function EmployeeDashboard({ employeeid }) {
 
       {/* 📅 ATTENDANCE */}
       <Card title="Attendance History">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-500">
+            View full attendance details
+          </p>
+          <Link
+            href={`/employee/${employeeid}/attendance`}
+            className="text-sm font-medium text-slate-700 hover:text-slate-900"
+          >
+            Open attendance
+          </Link>
+        </div>
         <div className="space-y-2">
           {logs.map((log, index) => (
             <div
@@ -110,6 +122,33 @@ export default function EmployeeDashboard({ employeeid }) {
           ))}
         </div>
       </Card>
+
+      {/* 🏖️ LEAVE MANAGEMENT */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card title="Apply Leave">
+          <p className="text-sm text-gray-500 mb-4">
+            Submit a new leave request for approval
+          </p>
+          <Link
+            href={`/employee/${employeeid}/apply-leave`}
+            className="inline-block w-full text-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Apply for Leave
+          </Link>
+        </Card>
+
+        <Card title="My Leaves">
+          <p className="text-sm text-gray-500 mb-4">
+            View your leave balance and application status
+          </p>
+          <Link
+            href={`/employee/${employeeid}/my-leaves`}
+            className="inline-block w-full text-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            View Leave History
+          </Link>
+        </Card>
+      </div>
     </div>
   );
 }
