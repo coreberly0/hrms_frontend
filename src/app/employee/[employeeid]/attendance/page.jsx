@@ -84,13 +84,21 @@ export default function AttendancePage() {
           throw new Error("Unable to fetch attendance logs");
         }
         const data = await response.json();
+        
+        // Merge with localStorage attendance data
+        const mergedLogs = mergeWithLocalStorageAttendance(
+          Array.isArray(data) ? data : []
+        );
+        
         if (isActive) {
-          setLogs(Array.isArray(data) ? data : []);
+          setLogs(mergedLogs);
         }
       } catch (fetchError) {
         if (isActive) {
           setError(fetchError.message || "Unable to fetch attendance logs");
-          setLogs([]);
+          // Still load from localStorage even if API fails
+          const localLogs = loadLocalStorageAttendance();
+          setLogs(localLogs);
         }
       } finally {
         if (isActive) setLoading(false);
@@ -103,6 +111,36 @@ export default function AttendancePage() {
       isActive = false;
     };
   }, [employeeid]);
+  
+  const loadLocalStorageAttendance = () => {
+    if (!employeeid || typeof window === "undefined") return [];
+    
+    const logsKey = `employeeAttendanceLogs:${employeeid}`;
+    const stored = window.localStorage.getItem(logsKey);
+    return stored ? JSON.parse(stored) : [];
+  };
+  
+  const mergeWithLocalStorageAttendance = (apiLogs) => {
+    if (!employeeid || typeof window === "undefined") return apiLogs;
+    
+    const localLogs = loadLocalStorageAttendance();
+    
+    // Create a map of API logs by date
+    const apiLogMap = {};
+    apiLogs.forEach((log) => {
+      if (log.date) {
+        apiLogMap[log.date] = log;
+      }
+    });
+    
+    // Merge local logs (they take precedence)
+    localLogs.forEach((localLog) => {
+      apiLogMap[localLog.date] = localLog;
+    });
+    
+    // Convert back to array
+    return Object.values(apiLogMap);
+  };
 
   useEffect(() => {
     if (!employeeid || typeof window === "undefined") return;
