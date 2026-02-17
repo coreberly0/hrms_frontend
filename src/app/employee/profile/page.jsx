@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useSearchParams } from "next/navigation"
 import { Upload } from "lucide-react"
@@ -14,6 +14,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  
   SelectValue,
 } from "@/components/ui/select"
 
@@ -38,7 +39,7 @@ import {
 
 import Sidebar from "../EmpSidebar"
 
-export default function EmployeeProfilePage() {
+function EmployeeProfileContent() {
   const searchParams = useSearchParams()
   const employeeId = searchParams.get("employeeId") || "default"
 
@@ -1542,5 +1543,13 @@ export default function EmployeeProfilePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function EmployeeProfilePage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading profile...</div>}>
+      <EmployeeProfileContent />
+    </Suspense>
   )
 }
