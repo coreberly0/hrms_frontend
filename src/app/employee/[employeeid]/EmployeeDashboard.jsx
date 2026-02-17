@@ -86,7 +86,7 @@ export default function EmployeeDashboard({ employeeid }) {
         </p>
       </Card>
 
-      {/* 📅 ATTENDANCE */}
+      {/*📅 ATTENDANCE */}
       <Card title="Attendance History">
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">

@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  CalendarPlus,
-  ClipboardList,
   CalendarCheck,
   FileText,
 } from "lucide-react";
@@ -52,24 +50,6 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* Apply Leave */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith(
-                `/employee/${empId}/apply-leave`
-              )}
-            >
-              <Link
-                href={`/employee/${empId}/apply-leave`}
-                className="flex gap-3 px-4 py-2"
-              >
-                <CalendarPlus className="h-5 w-5" />
-                Apply Leave
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
           {/* Attendance */}
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -102,24 +82,6 @@ export function EmpSidebar() {
               >
                 <FileText className="h-5 w-5" />
                 Payslip
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {/* My Leaves */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith(
-                `/employee/${empId}/my-leaves`
-              )}
-            >
-              <Link
-                href={`/employee/${empId}/my-leaves`}
-                className="flex gap-3 px-4 py-2"
-              >
-                <ClipboardList className="h-5 w-5" />
-                My Leaves
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

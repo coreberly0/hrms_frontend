@@ -37,8 +37,6 @@ import {
 } from "@/data/professionalOptions"
 
 
-import Sidebar from "../EmpSidebar"
-
 function EmployeeProfileContent() {
   const searchParams = useSearchParams()
   const employeeId = searchParams.get("employeeId") || "default"
@@ -157,11 +155,8 @@ function EmployeeProfileContent() {
   const showViewOnly = role === "employee" && isProfileSaved
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
-
-      <div className="flex-1 p-6">
-        <div className="max-w-full space-y-4">
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="max-w-full space-y-4">
 
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-[#1C225B]">
@@ -1541,7 +1536,6 @@ function EmployeeProfileContent() {
             </form>
           </Form>
         </div>
-      </div>
     </div>
   )
 }
