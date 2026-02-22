@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   CalendarCheck,
   FileText,
+  FolderKanban
 } from "lucide-react";
 
 import {
@@ -19,8 +20,6 @@ import {
 
 export function EmpSidebar() {
   const pathname = usePathname();
-
-  // 🔥 Extract Employee ID → /employee/emp1/...
   const empId = pathname.split("/")[2];
 
   if (!empId) return null;
@@ -54,9 +53,7 @@ export function EmpSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname.startsWith(
-                `/employee/${empId}/attendance`
-              )}
+              isActive={pathname.startsWith(`/employee/${empId}/attendance`)}
             >
               <Link
                 href={`/employee/${empId}/attendance`}
@@ -72,16 +69,30 @@ export function EmpSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname.startsWith(
-                `/employee/${empId}/id/payslip`
-              )}
+              isActive={pathname.startsWith(`/employee/${empId}/payslip`)}
             >
               <Link
-                href={`/employee/${empId}/id/payslip`}
+                href={`/employee/${empId}/payslip`}
                 className="flex gap-3 px-4 py-2"
               >
                 <FileText className="h-5 w-5" />
                 Payslip
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Projects */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/projects`)}
+            >
+              <Link
+                href={`/employee/${empId}/projects`}
+                className="flex gap-3 px-4 py-2"
+              >
+                <FolderKanban className="h-5 w-5" />
+                Projects
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
