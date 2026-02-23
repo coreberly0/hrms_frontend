@@ -65,7 +65,7 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* Payslip */}
+          {/* Payslip
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -79,7 +79,7 @@ export function EmpSidebar() {
                 Payslip
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
 
           {/* Projects */}
           <SidebarMenuItem>

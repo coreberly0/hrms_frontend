@@ -1,163 +1,44 @@
 const API_URL = "https://hrms-backend-0r5r.onrender.com";
 
-/* ================================
-   🔹 Helper Function
-================================ */
-const handleResponse = async (res) => {
-  const data = await res.json().catch(() => null);
+const request = async (endpoint, options = {}) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Token missing");
+
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
+  });
 
   if (!res.ok) {
-    throw new Error(data?.message || "Something went wrong");
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Request failed");
   }
 
-  return data;
+  return res.json();
 };
 
-const getAuthHeader = (token) => {
-  if (!token) {
-    throw new Error("Authentication token missing");
-  }
+/* PROJECTS */
+export const getProjectsByEmployee = (employeeId) =>
+  request(`/projects/employee/${employeeId}`);
 
-  return {
-    Authorization: `Bearer ${token}`,
-  };
-};
+export const createProject = (data) =>
+  request("/projects", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 
-/* ================================
-   🔹 Get All Projects
-================================ */
-export const getProjects = async (token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects`, {
-      headers: {
-        ...getAuthHeader(token),
-      },
-    });
+/* ASSIGN */
+export const assignEmployeeToProject = (data) =>
+  request("/projects/assign", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error fetching projects:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Get Project By ID
-================================ */
-export const getProjectById = async (id, token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      headers: {
-        ...getAuthHeader(token),
-      },
-    });
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error fetching project:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Create Project
-================================ */
-export const createProject = async (projectData, token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(token),
-      },
-      body: JSON.stringify(projectData),
-    });
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error creating project:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Update Project
-================================ */
-export const updateProject = async (id, projectData, token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(token),
-      },
-      body: JSON.stringify(projectData),
-    });
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error updating project:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Delete Project
-================================ */
-export const deleteProject = async (id, token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      method: "DELETE",
-      headers: {
-        ...getAuthHeader(token),
-      },
-    });
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error deleting project:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Assign Employee To Project
-================================ */
-export const assignEmployeeToProject = async (data, token) => {
-  try {
-    const res = await fetch(`${API_URL}/projects/assign`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(token),
-      },
-      body: JSON.stringify(data),
-    });
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error assigning employee:", err.message);
-    throw err;
-  }
-};
-
-/* ================================
-   🔹 Get Projects By Employee ID
-================================ */
-export const getProjectsByEmployee = async (employeeId, token) => {
-  try {
-    const res = await fetch(
-      `${API_URL}/projects/employee/${employeeId}`,
-      {
-        headers: {
-          ...getAuthHeader(token),
-        },
-      }
-    );
-
-    return await handleResponse(res);
-  } catch (err) {
-    console.error("Error fetching employee projects:", err.message);
-    throw err;
-  }
-};
+export const removeEmployeeFromProject = (projectId, employeeId) =>
+  request(`/projects/${projectId}/employee/${employeeId}`, {
+    method: "DELETE",
+  });
