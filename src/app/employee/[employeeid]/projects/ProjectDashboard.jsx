@@ -9,6 +9,10 @@ import {
 import { getEmployees, getEmployeeById } from "@/services/employee";
 import AddProject from "./AddProject";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
 export default function ProjectDashboard({ employeeid }) {
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -28,7 +32,6 @@ export default function ProjectDashboard({ employeeid }) {
 
       const proj = await getProjectsByEmployee(employeeid);
 
-      // 🔥 NORMALIZE HERE (IMPORTANT)
       const normalized = Array.isArray(proj)
         ? proj.map((p) => ({
             ...p,
@@ -45,7 +48,7 @@ export default function ProjectDashboard({ employeeid }) {
         setEmployees(Array.isArray(empList) ? empList : []);
       }
     } catch (err) {
-      console.error("Load error:", err.message);
+      console.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -65,127 +68,132 @@ export default function ProjectDashboard({ employeeid }) {
       role_in_project: "Developer",
     });
 
-    await loadData(); // force refresh
+    loadData();
   };
 
   /* ================= REMOVE ================= */
   const handleRemove = async (projectId, empId) => {
     await removeEmployeeFromProject(projectId, empId);
-    await loadData();
+    loadData();
   };
 
   if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="p-6 space-y-6">
-      {/* ADD PROJECT */}
-      {isManager && (
-        <button
-          onClick={() => setShowAdd(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          ➕ Add Project
-        </button>
-      )}
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Projects</h1>
+
+        {isManager && (
+          <Button onClick={() => setShowAdd(true)}>
+            ➕ Add Project
+          </Button>
+        )}
+      </div>
 
       {/* ADD PROJECT MODAL */}
       {showAdd && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded w-96">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96">
             <AddProject
               onSuccess={() => {
                 setShowAdd(false);
                 loadData();
               }}
             />
-            <button
+            <Button
+              variant="destructive"
+              className="mt-4 w-full"
               onClick={() => setShowAdd(false)}
-              className="mt-3 text-red-500"
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* PROJECT LIST */}
-      {projects.map((project) => {
-        const assigned = project.assigned_employees;
+      {/* PROJECT GRID (3 PER ROW) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {projects.map((project) => {
+          const assigned = project.assigned_employees;
 
-        return (
-          <div
-            key={project.id}
-            className="border p-4 rounded shadow space-y-3"
-          >
-            {/* HEADER */}
-            <div className="flex justify-between">
-              <h2 className="font-bold text-lg">
-                {project.project_name}
-              </h2>
-              <span className="text-gray-600">
-                💰 {project.budget}
-              </span>
-            </div>
+          return (
+            <Card key={project.id} className="hover:shadow-lg transition">
+              <CardHeader className="space-y-2">
+                <CardTitle className="text-lg">
+                  {project.project_name}
+                </CardTitle>
 
-            {/* COUNT */}
-            <div className="text-sm text-gray-600">
-              👥 Assigned Employees: {assigned.length}
-            </div>
+                {isManager && (
+                  <Badge variant="secondary" className="w-fit">
+                    💰 ₹{Number(project.budget || 0).toLocaleString()}
+                  </Badge>
+                )}
+              </CardHeader>
 
-            {/* AVATARS */}
-            <div className="flex gap-2 flex-wrap">
-              {assigned.length > 0 ? (
-                assigned.map((emp) => (
-                  <div
-                    key={emp.employee_id}
-                    className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
-                  >
-                    <div className="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm">
-                      {emp.employee_name.charAt(0)}
-                    </div>
+              <CardContent className="space-y-4">
+                {/* EMPLOYEE COUNT */}
+                <div className="text-sm text-muted-foreground">
+                  👥 {assigned.length} Employees Assigned
+                </div>
 
-                    <span className="text-sm">
-                      {emp.employee_name}
-                    </span>
-
-                    {isManager && (
-                      <button
-                        className="text-red-500 ml-1"
-                        onClick={() =>
-                          handleRemove(project.id, emp.employee_id)
-                        }
+                {/* AVATARS */}
+                <div className="flex flex-wrap gap-2">
+                  {assigned.length > 0 ? (
+                    assigned.map((emp) => (
+                      <div
+                        key={emp.employee_id}
+                        className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full"
                       >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <span className="text-gray-500 italic">
-                  👤 No employees assigned
-                </span>
-              )}
-            </div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                          {emp.employee_name.charAt(0)}
+                        </div>
 
-            {/* ASSIGN */}
-            {isManager && (
-              <select
-                className="border p-2 mt-2"
-                onChange={(e) =>
-                  handleAssign(project.id, e.target.value)
-                }
-              >
-                <option value="">Assign employee</option>
-                {employees.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        );
-      })}
+                        <span className="text-sm">
+                          {emp.employee_name}
+                        </span>
+
+                        {isManager && (
+                          <button
+                            className="text-red-500 ml-1"
+                            onClick={() =>
+                              handleRemove(project.id, emp.employee_id)
+                            }
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground italic">
+                      No employees assigned
+                    </span>
+                  )}
+                </div>
+
+                {/* ASSIGN */}
+                {isManager && (
+                  <select
+                    className="border rounded-md p-2 w-full"
+                    onChange={(e) =>
+                      handleAssign(project.id, e.target.value)
+                    }
+                  >
+                    <option value="">Assign employee</option>
+                    {employees.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
