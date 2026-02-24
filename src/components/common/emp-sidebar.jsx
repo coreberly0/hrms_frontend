@@ -25,12 +25,12 @@ export function EmpSidebar() {
   if (!empId) return null;
 
   return (
-    <Sidebar className="bg-gray-200 text-black">
-      <SidebarHeader className="text-xl font-bold px-4 py-3 border-b border-gray-400">
+    <Sidebar className="bg-slate-900 text-white">
+      <SidebarHeader className="bg-slate-900 text-xl font-bold px-4 py-3 border-b border-[#1C225B]">
         Employee Panel
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="bg-slate-900 px-2 py-4">
         <SidebarMenu className="space-y-1">
 
           {/* Dashboard */}
