@@ -26,12 +26,13 @@ export function HRSidebar() {
   if (!hrId) return null;
 
   return (
-    <Sidebar className="bg-gray-300 text-black">
-      <SidebarHeader className="text-xl font-bold px-4 py-3 border-b border-gray-400">
+    <Sidebar className="!bg-[#1C225B] text-white">
+      <SidebarHeader className="!bg-[#1C225B] text-xl font-bold px-4 py-3 border-b border-[#1C225B]">
+
         HR Panel
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className="!bg-[#1C225B] px-2 py-4">
         <SidebarMenu className="space-y-1">
 
           {/* Dashboard */}

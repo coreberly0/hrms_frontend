@@ -150,7 +150,7 @@ export default function EmployeeDashboard({ employeeid }) {
             {employee.position} · {employee.department}
           </p>
         </div>
-        <span className="px-4 py-1 rounded-full bg-white/20">
+        <span className="px-4 py-2 rounded-full h-10 bg-white/22">
           {todayStatus || employee.status}
         </span>
       </div>
@@ -200,7 +200,7 @@ export default function EmployeeDashboard({ employeeid }) {
 
         <SectionCard title="Company Info">
           <Info label="Role" value={employee.role} />
-          <Info label="Salary" value={<><DollarSign size={14}/> ₹{employee.salary}</>} />
+          <Info label="Salary" value={<> ₹{employee.salary}</>} />
           <Info label="Joining Date" value={formatDate(employee.joining_date)} />
         </SectionCard>
       </div>
