@@ -3,197 +3,166 @@
 import { useEffect, useState } from "react";
 import {
   getProjectsByEmployee,
-  assignEmployeeToProject,
-  removeEmployeeFromProject,
+  getAllProjects,
+  deleteProject,
 } from "@/services/projectService";
-import { getEmployees, getEmployeeById } from "@/services/employee";
+import { getEmployeeById } from "@/services/employee";
+
 import AddProject from "./AddProject";
+import EditProject from "./EditProject";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ProjectDashboard({ employeeid }) {
   const [projects, setProjects] = useState([]);
-  const [employees, setEmployees] = useState([]);
   const [role, setRole] = useState("");
+  const [edit, setEdit] = useState(null);
+  const [add, setAdd] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
 
-  const isManager = role?.toLowerCase() === "manager";
-
-  /* ================= LOAD DATA ================= */
-  const loadData = async () => {
+  const load = async () => {
     try {
       setLoading(true);
 
       const emp = await getEmployeeById(employeeid);
-      setRole(emp?.role || "");
+      const empRole = emp.role.toLowerCase();
+      setRole(empRole);
 
-      const proj = await getProjectsByEmployee(employeeid);
+      const data =
+        empRole === "manager"
+          ? await getAllProjects()
+          : await getProjectsByEmployee(employeeid);
 
-      const normalized = Array.isArray(proj)
-        ? proj.map((p) => ({
-            ...p,
-            assigned_employees: Array.isArray(p.assigned_employees)
-              ? p.assigned_employees
-              : [],
-          }))
-        : [];
+      // Normalize employees (IMPORTANT FIX)
+      const normalized = (data || []).map((p) => ({
+        ...p,
+        employees: Array.isArray(p.employees) ? p.employees : [],
+      }));
 
       setProjects(normalized);
-
-      if (emp?.role?.toLowerCase() === "manager") {
-        const empList = await getEmployees();
-        setEmployees(Array.isArray(empList) ? empList : []);
-      }
     } catch (err) {
-      console.error(err.message);
+      console.error("Dashboard load error:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (employeeid) loadData();
+    load();
   }, [employeeid]);
 
-  /* ================= ASSIGN ================= */
-  const handleAssign = async (projectId, employeeId) => {
-    if (!employeeId) return;
-
-    await assignEmployeeToProject({
-      project_id: projectId,
-      employee_id: Number(employeeId),
-      role_in_project: "Developer",
-    });
-
-    loadData();
-  };
-
-  /* ================= REMOVE ================= */
-  const handleRemove = async (projectId, empId) => {
-    await removeEmployeeFromProject(projectId, empId);
-    loadData();
-  };
-
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) {
+    return <p className="p-6 text-gray-500">Loading projects...</p>;
+  }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-4">
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Projects</h1>
-
-        {isManager && (
-          <Button onClick={() => setShowAdd(true)}>
-            ➕ Add Project
-          </Button>
+        {role === "manager" && (
+          <Button onClick={() => setAdd(true)}>➕ Add Project</Button>
         )}
       </div>
 
-      {/* ADD PROJECT MODAL */}
-      {showAdd && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <AddProject
-              onSuccess={() => {
-                setShowAdd(false);
-                loadData();
-              }}
-            />
-            <Button
-              variant="destructive"
-              className="mt-4 w-full"
-              onClick={() => setShowAdd(false)}
-            >
-              Close
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* PROJECT LIST */}
+      {projects.length === 0 ? (
+        <p className="text-gray-500">No projects found.</p>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-4">
+          {projects.map((p) => (
+            <Card key={p.id}>
+              <CardHeader>
+                <CardTitle>{p.project_name}</CardTitle>
 
-      {/* PROJECT GRID (3 PER ROW) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => {
-          const assigned = project.assigned_employees;
-
-          return (
-            <Card key={project.id} className="hover:shadow-lg transition">
-              <CardHeader className="space-y-2">
-                <CardTitle className="text-lg">
-                  {project.project_name}
-                </CardTitle>
-
-                {isManager && (
-                  <Badge variant="secondary" className="w-fit">
-                    💰 ₹{Number(project.budget || 0).toLocaleString()}
-                  </Badge>
-                )}
+                <Badge
+                  variant={
+                    p.status === "Completed"
+                      ? "default"
+                      : p.status === "Ongoing"
+                      ? "secondary"
+                      : "outline"
+                  }
+                >
+                  {p.status || "Not Started"}
+                </Badge>
               </CardHeader>
 
-              <CardContent className="space-y-4">
-                {/* EMPLOYEE COUNT */}
-                <div className="text-sm text-muted-foreground">
-                  👥 {assigned.length} Employees Assigned
-                </div>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {p.description || "No description"}
+                </p>
 
-                {/* AVATARS */}
-                <div className="flex flex-wrap gap-2">
-                  {assigned.length > 0 ? (
-                    assigned.map((emp) => (
-                      <div
-                        key={emp.employee_id}
-                        className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full"
+                <p className="text-sm">
+                  <strong>Progress:</strong> {p.progress || 0}%
+                </p>
+
+                {/* ✅ Avatar Group (FIXED) */}
+                {p.employees.length > 0 && (
+                  <div className="flex items-center -space-x-2">
+                    {p.employees.map((emp) => (
+                      <Avatar
+                        key={emp.id}
+                        className="w-8 h-8 border-2 border-white"
                       >
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                          {emp.employee_name.charAt(0)}
-                        </div>
-
-                        <span className="text-sm">
-                          {emp.employee_name}
-                        </span>
-
-                        {isManager && (
-                          <button
-                            className="text-red-500 ml-1"
-                            onClick={() =>
-                              handleRemove(project.id, emp.employee_id)
-                            }
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <span className="text-sm text-muted-foreground italic">
-                      No employees assigned
-                    </span>
-                  )}
-                </div>
-
-                {/* ASSIGN */}
-                {isManager && (
-                  <select
-                    className="border rounded-md p-2 w-full"
-                    onChange={(e) =>
-                      handleAssign(project.id, e.target.value)
-                    }
-                  >
-                    <option value="">Assign employee</option>
-                    {employees.map((e) => (
-                      <option key={e.id} value={e.id}>
-                        {e.name}
-                      </option>
+                        <AvatarFallback>
+                          {emp.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                     ))}
-                  </select>
+                  </div>
+                )}
+
+                {/* Manager Actions */}
+                {role === "manager" && (
+                  <div className="flex gap-2 pt-2">
+                    <Button size="sm" onClick={() => setEdit(p)}>
+                      ✏️ Edit
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={async () => {
+                        await deleteProject(p.id);
+                        load();
+                      }}
+                    >
+                      🗑 Delete
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* ADD MODAL */}
+      {add && (
+        <AddProject
+          onClose={() => setAdd(false)}
+          onSuccess={() => {
+            setAdd(false);
+            load();
+          }}
+        />
+      )}
+
+      {/* EDIT MODAL */}
+      {edit && (
+        <EditProject
+          project={edit}
+          onClose={() => setEdit(null)}
+          onSuccess={() => {
+            setEdit(null);
+            load();
+          }}
+        />
+      )}
     </div>
   );
 }
