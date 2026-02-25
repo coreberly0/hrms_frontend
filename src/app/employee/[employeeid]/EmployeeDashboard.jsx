@@ -1,241 +1,122 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  Clock,
-  LogIn,
-  LogOut,
-  DollarSign,
-} from "lucide-react";
 import { getEmployeeById } from "@/services/employee";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
-export default function EmployeeDashboard({ employeeid }) {
-  const [employee, setEmployee] = useState(null);
-  const [loading, setLoading] = useState(true);
+import {
+  Mail,
+  Phone,
+  Briefcase,
+  IndianRupee,
+  Calendar,
+  MapPin,
+} from "lucide-react";
 
-  const [clockInTime, setClockInTime] = useState(null);
-  const [clockOutTime, setClockOutTime] = useState(null);
-  const [todayStatus, setTodayStatus] = useState(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [token, setToken] = useState(null);
+export default function EmployeeProfile({ employeeid }) {
+  const [emp, setEmp] = useState(null);
 
-  /* ================= TOKEN ================= */
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
-  }, []);
+    if (!employeeid) return;
+    getEmployeeById(employeeid).then(setEmp);
+  }, [employeeid]);
 
-  /* ================= CURRENT TIME ================= */
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  /* ================= FETCH EMPLOYEE ================= */
-  useEffect(() => {
-    if (!employeeid || !token) return;
-
-    async function fetchEmployee() {
-      try {
-        const data = await getEmployeeById(employeeid, token);
-        setEmployee(data);
-        loadTodayAttendance(employeeid);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchEmployee();
-  }, [employeeid, token]);
-
-  /* ================= ATTENDANCE ================= */
-
-  const getTodayKey = () =>
-    new Date().toISOString().split("T")[0];
-
-  const loadTodayAttendance = (empId) => {
-    const key = `attendance:${empId}:${getTodayKey()}`;
-    const stored = localStorage.getItem(key);
-    if (!stored) return;
-
-    const data = JSON.parse(stored);
-    setClockInTime(data.clockInTime ? new Date(data.clockInTime) : null);
-    setClockOutTime(data.clockOutTime ? new Date(data.clockOutTime) : null);
-    setTodayStatus(data.status);
-  };
-
-  const handleClockIn = () => {
-    const now = new Date();
-    const key = `attendance:${employeeid}:${getTodayKey()}`;
-
-    localStorage.setItem(
-      key,
-      JSON.stringify({
-        clockInTime: now.toISOString(),
-        clockOutTime: null,
-        status: null,
-      })
-    );
-
-    setClockInTime(now);
-    setClockOutTime(null);
-    setTodayStatus(null);
-  };
-
-  const handleClockOut = () => {
-    if (!clockInTime) return;
-
-    const now = new Date();
-    const hours = (now - clockInTime) / (1000 * 60 * 60);
-    const status = hours >= 8 ? "Present" : "Absent";
-
-    const key = `attendance:${employeeid}:${getTodayKey()}`;
-
-    localStorage.setItem(
-      key,
-      JSON.stringify({
-        clockInTime: clockInTime.toISOString(),
-        clockOutTime: now.toISOString(),
-        status,
-      })
-    );
-
-    setClockOutTime(now);
-    setTodayStatus(status);
-  };
-
-  const formatTime = (date) =>
-    date
-      ? date.toLocaleTimeString("en-IN", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })
-      : "--:--:--";
-
-  const formatDate = (date) =>
-    date ? new Date(date).toLocaleDateString("en-IN") : "-";
-
-  const calculateWorkedTime = () => {
-    if (!clockInTime) return "00:00:00";
-    const end = clockOutTime || currentTime;
-    const diff = end - clockInTime;
-
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(
-      2,
-      "0"
-    )}:${String(s).padStart(2, "0")}`;
-  };
-
-  if (loading)
-    return <div className="text-center p-10">Loading dashboard...</div>;
-
-  if (!employee)
-    return <div className="text-center text-red-500">Employee not found</div>;
+  if (!emp) return null;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
 
-      {/* HEADER */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 flex justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{employee.name}</h1>
-          <p className="opacity-80">
-            {employee.position} · {employee.department}
-          </p>
+        {/* ===== LEFT CONTENT ===== */}
+        <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-8">
+
+          <Section title="Personal Details">
+            <Row icon={Mail} label="Email" value={emp.email} />
+            <Row icon={Phone} label="Phone" value={emp.personal_phone} />
+            <Row label="Gender" value={emp.gender} />
+            <Row label="Marital Status" value={emp.marital_status} />
+          </Section>
+
+          <Section title="Employment Information">
+            <Row icon={Briefcase} label="Role" value={emp.role} />
+            <Row icon={IndianRupee} label="Salary" value={`₹ ${emp.salary}`} />
+            <Row icon={Calendar} label="Joining Date" value={emp.joining_date} />
+          </Section>
+
+          <Section title="Address">
+            <div className="flex items-start gap-3 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 mt-1" />
+              <p>
+                {emp.door_no}, {emp.street}, {emp.area}, <br />
+                {emp.city}, {emp.state} - {emp.pincode}
+              </p>
+            </div>
+          </Section>
+
         </div>
-        <span className="px-4 py-2 rounded-full h-10 bg-white/22">
-          {todayStatus || employee.status}
-        </span>
-      </div>
 
-      {/* ATTENDANCE */}
-      <SectionCard title="Today's Attendance">
-        <div className="text-center mb-4">
-          <Clock className="mx-auto text-indigo-600" />
-          <p className="text-2xl font-bold">{formatTime(currentTime)}</p>
+        {/* ===== RIGHT SIDEBAR ===== */}
+        <div className="lg:col-span-4 bg-slate-900 text-white p-6 sm:p-8 flex flex-col items-center text-center space-y-6">
+
+          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white">
+            <AvatarFallback className="text-3xl font-bold bg-slate-700">
+              {emp.name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold">
+              {emp.name}
+            </h2>
+            <p className="text-slate-300 text-sm mt-1">
+              {emp.position}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              ID: {emp.employee_id}
+            </p>
+          </div>
+
+          <Badge className="bg-green-500 text-white px-4 py-1">
+            {emp.status}
+          </Badge>
+
+          <Separator className="bg-slate-700 w-full" />
+
+          <div className="text-sm text-slate-300 space-y-2">
+            <p>{emp.department}</p>
+            <p>{emp.company_name}</p>
+          </div>
+
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <AttendanceBox title="Clock In" icon={<LogIn />} time={formatTime(clockInTime)} color="green" />
-          <AttendanceBox title="Clock Out" icon={<LogOut />} time={formatTime(clockOutTime)} color="red" />
-        </div>
-
-        {clockInTime && (
-          <p className="text-center mt-4 font-bold">
-            Worked: {calculateWorkedTime()}
-          </p>
-        )}
-
-        <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleClockIn}
-            disabled={clockInTime && !clockOutTime}
-            className="flex-1 bg-green-600 text-white py-2 rounded"
-          >
-            Clock In
-          </button>
-          <button
-            onClick={handleClockOut}
-            disabled={!clockInTime || clockOutTime}
-            className="flex-1 bg-red-600 text-white py-2 rounded"
-          >
-            Clock Out
-          </button>
-        </div>
-      </SectionCard>
-
-      {/* INFO */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <SectionCard title="Personal Info">
-          <Info label="Email" value={employee.email} />
-          <Info label="Phone" value={employee.personal_phone} />
-        </SectionCard>
-
-        <SectionCard title="Company Info">
-          <Info label="Role" value={employee.role} />
-          <Info label="Salary" value={<> ₹{employee.salary}</>} />
-          <Info label="Joining Date" value={formatDate(employee.joining_date)} />
-        </SectionCard>
       </div>
     </div>
   );
 }
 
-/* ================= COMPONENTS ================= */
-
-function SectionCard({ title, children }) {
+/* ===== SECTION ===== */
+function Section({ title, children }) {
   return (
-    <div className="bg-white rounded-xl shadow p-6 space-y-4">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      {children}
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }
 
-function Info({ label, value }) {
+/* ===== ROW ===== */
+function Row({ icon: Icon, label, value }) {
   return (
-    <div className="flex justify-between border-b pb-2">
-      <span className="text-gray-500">{label}</span>
-      <span>{value || "-"}</span>
-    </div>
-  );
-}
-
-function AttendanceBox({ title, icon, time, color }) {
-  return (
-    <div className={`p-3 rounded border ${color === "green" ? "bg-green-50" : "bg-red-50"}`}>
-      <div className="flex items-center gap-2">
-        {icon}
-        <span>{title}</span>
+    <div className="flex justify-between items-center border-b pb-2 text-sm gap-4">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        {Icon && <Icon className="h-4 w-4" />}
+        {label}
       </div>
-      <p className="text-xl font-bold">{time}</p>
+      <span className="font-medium text-right break-all">
+        {value || "-"}
+      </span>
     </div>
   );
 }
