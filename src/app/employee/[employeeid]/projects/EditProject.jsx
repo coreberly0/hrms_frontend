@@ -21,12 +21,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
-import { X } from "lucide-react"; // ✅ lucide-react icon
+import { X } from "lucide-react";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 import {
   updateProject,
   assignEmployeeToProject,
-  removeEmployeeFromProject, // ✅ IMPORT REMOVE
+  removeEmployeeFromProject,
 } from "@/services/projectService";
 import { getEmployees } from "@/services/employee";
 
@@ -34,6 +36,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
   const [employees, setEmployees] = useState([]);
   const [assignedIds, setAssignedIds] = useState([]);
   const [selectKey, setSelectKey] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     project_name: "",
@@ -71,28 +74,48 @@ export default function EditProject({ project, onClose, onSuccess }) {
   const addEmployee = async (id) => {
     if (assignedIds.includes(id)) return;
 
-    await assignEmployeeToProject({
-      project_id: project.id,
-      employee_id: id,
-    });
+    try {
+      await assignEmployeeToProject({
+        project_id: project.id,
+        employee_id: id,
+      });
 
-    setAssignedIds((prev) => [...prev, id]);
-    setSelectKey((k) => k + 1);
+      setAssignedIds((prev) => [...prev, id]);
+      toast.success("Employee assigned");
+    } catch {
+      toast.error("Failed to assign employee");
+    } finally {
+      setSelectKey((k) => k + 1);
+    }
   };
 
-  /* ❌ REMOVE EMPLOYEE */
+  /* REMOVE EMPLOYEE */
   const removeEmployee = async (id) => {
-    await removeEmployeeFromProject(project.id, id);
-
-    setAssignedIds((prev) => prev.filter((eid) => eid !== id));
-    setSelectKey((k) => k + 1);
+    try {
+      await removeEmployeeFromProject(project.id, id);
+      setAssignedIds((prev) => prev.filter((eid) => eid !== id));
+      toast.success("Employee removed");
+    } catch {
+      toast.error("Failed to remove employee");
+    } finally {
+      setSelectKey((k) => k + 1);
+    }
   };
 
-  /* SUBMIT PROJECT UPDATE */
+  /* SAVE PROJECT */
   const submit = async () => {
-    await updateProject(project.id, form);
-    onSuccess();
-    onClose();
+    try {
+      setLoading(true);
+      await updateProject(project.id, form);
+
+      toast.success("Project updated successfully");
+      onSuccess();
+      onClose();
+    } catch {
+      toast.error("Failed to update project");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -105,18 +128,14 @@ export default function EditProject({ project, onClose, onSuccess }) {
           </DialogDescription>
         </DialogHeader>
 
-        {/* PROJECT DETAILS */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground">
-            Project Details
-          </h3>
-
           <Input
             placeholder="Project Name"
             value={form.project_name}
             onChange={(e) =>
               setForm({ ...form, project_name: e.target.value })
             }
+            disabled={loading}
           />
 
           <Textarea
@@ -126,6 +145,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
             onChange={(e) =>
               setForm({ ...form, description: e.target.value })
             }
+            disabled={loading}
           />
 
           <Input
@@ -135,42 +155,32 @@ export default function EditProject({ project, onClose, onSuccess }) {
             onChange={(e) =>
               setForm({ ...form, budget: e.target.value })
             }
+            disabled={loading}
           />
         </div>
 
         <Separator />
 
-        {/* STATUS */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-muted-foreground">
-            Project Status
-          </h3>
-
-          <Select
-            value={form.status}
-            onValueChange={(value) =>
-              setForm({ ...form, status: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Not Started">Not Started</SelectItem>
-              <SelectItem value="Ongoing">Ongoing</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={form.status}
+          onValueChange={(value) =>
+            setForm({ ...form, status: value })
+          }
+          disabled={loading}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Not Started">Not Started</SelectItem>
+            <SelectItem value="Ongoing">Ongoing</SelectItem>
+            <SelectItem value="Completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Separator />
 
-        {/* ASSIGNED EMPLOYEES */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground">
-            Assigned Employees
-          </h3>
-
           {assignedIds.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No employees assigned
@@ -186,11 +196,10 @@ export default function EditProject({ project, onClose, onSuccess }) {
                     className="flex items-center gap-1 pr-1"
                   >
                     {emp?.name}
-
-                    {/* ❌ REMOVE ICON */}
                     <button
                       onClick={() => removeEmployee(id)}
                       className="ml-1 rounded hover:bg-muted p-0.5"
+                      disabled={loading}
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -200,38 +209,43 @@ export default function EditProject({ project, onClose, onSuccess }) {
             </div>
           )}
 
-          {/* ASSIGN DROPDOWN */}
           <Select
             key={selectKey}
             onValueChange={(value) => addEmployee(Number(value))}
+            disabled={loading}
           >
             <SelectTrigger>
               <SelectValue placeholder="Assign Employee" />
             </SelectTrigger>
             <SelectContent>
-              {employees.map((emp) => {
-                const assigned = assignedIds.includes(emp.id);
-                return (
-                  <SelectItem
-                    key={emp.id}
-                    value={emp.id.toString()}
-                    disabled={assigned}
-                  >
-                    {emp.name}
-                    {assigned && " (Assigned)"}
-                  </SelectItem>
-                );
-              })}
+              {employees.map((emp) => (
+                <SelectItem
+                  key={emp.id}
+                  value={emp.id.toString()}
+                  disabled={assignedIds.includes(emp.id)}
+                >
+                  {emp.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* ACTIONS */}
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={submit}>Save Changes</Button>
+
+          <Button onClick={submit} disabled={loading}>
+            {loading ? (
+              <>
+                <Spinner className="mr-2 h-4 w-4" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
