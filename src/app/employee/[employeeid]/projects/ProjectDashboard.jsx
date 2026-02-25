@@ -11,10 +11,18 @@ import { getEmployeeById } from "@/services/employee";
 import AddProject from "./AddProject";
 import EditProject from "./EditProject";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Spinner } from "@/components/ui/spinner";
+import { Separator } from "@/components/ui/separator";
+
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Wallet,
+} from "lucide-react";
 
 export default function ProjectDashboard({ employeeid }) {
   const [projects, setProjects] = useState([]);
@@ -36,15 +44,14 @@ export default function ProjectDashboard({ employeeid }) {
           ? await getAllProjects()
           : await getProjectsByEmployee(employeeid);
 
-      // Normalize employees (IMPORTANT FIX)
-      const normalized = (data || []).map((p) => ({
-        ...p,
-        employees: Array.isArray(p.employees) ? p.employees : [],
-      }));
-
-      setProjects(normalized);
+      setProjects(
+        (data || []).map((p) => ({
+          ...p,
+          employees: Array.isArray(p.employees) ? p.employees : [],
+        }))
+      );
     } catch (err) {
-      console.error("Dashboard load error:", err.message);
+      console.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -54,30 +61,79 @@ export default function ProjectDashboard({ employeeid }) {
     load();
   }, [employeeid]);
 
+  /* ✅ CENTER SPINNER */
   if (loading) {
-    return <p className="p-6 text-gray-500">Loading projects...</p>;
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <Spinner className="h-10 w-10" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-8 space-y-6">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Projects</h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Project Management
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Overview of all company projects
+          </p>
+        </div>
+
         {role === "manager" && (
-          <Button onClick={() => setAdd(true)}>➕ Add Project</Button>
+          <Button
+            size="default"
+            className="shadow-sm"
+            onClick={() => setAdd(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            New Project
+          </Button>
         )}
       </div>
 
-      {/* PROJECT LIST */}
-      {projects.length === 0 ? (
-        <p className="text-gray-500">No projects found.</p>
-      ) : (
-        <div className="grid md:grid-cols-3 gap-4">
-          {projects.map((p) => (
-            <Card key={p.id}>
-              <CardHeader>
-                <CardTitle>{p.project_name}</CardTitle>
+      <Separator />
 
+      {/* TABLE HEADER */}
+      {projects.length > 0 && (
+        <div className="grid grid-cols-12 text-sm font-medium text-muted-foreground px-4">
+          <div className="col-span-3">Project</div>
+          <div className="col-span-2">Status</div>
+          <div className="col-span-2">Budget</div>
+          <div className="col-span-3">Team</div>
+          {role === "manager" && (
+            <div className="col-span-2 text-right">Actions</div>
+          )}
+        </div>
+      )}
+
+      {/* PROJECT ROWS */}
+      <div className="space-y-2">
+        {projects.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            No projects available
+          </div>
+        ) : (
+          projects.map((p) => (
+            <div
+              key={p.id}
+              className="grid grid-cols-12 items-center bg-card border rounded-xl px-4 py-4 hover:shadow-md transition"
+            >
+              {/* PROJECT NAME */}
+              <div className="col-span-3">
+                <div className="font-semibold">
+                  {p.project_name}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {p.description || "No description"}
+                </div>
+              </div>
+
+              {/* STATUS */}
+              <div className="col-span-2">
                 <Badge
                   variant={
                     p.status === "Completed"
@@ -89,57 +145,55 @@ export default function ProjectDashboard({ employeeid }) {
                 >
                   {p.status || "Not Started"}
                 </Badge>
-              </CardHeader>
+              </div>
 
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  {p.description || "No description"}
-                </p>
+              {/* BUDGET */}
+              <div className="col-span-2 flex items-center gap-2 font-medium">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+                ₹{Number(p.budget || 0).toLocaleString()}
+              </div>
 
-                <p className="text-sm">
-                  <strong>Progress:</strong> {p.progress || 0}%
-                </p>
+              {/* EMPLOYEE AVATARS */}
+              <div className="col-span-3 flex -space-x-2">
+                {p.employees.map((emp) => (
+                  <Avatar
+                    key={emp.id}
+                    className="h-9 w-9 border-2 border-background"
+                  >
+                    <AvatarFallback>
+                      {emp.name?.charAt(0)?.toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
 
-                {/* ✅ Avatar Group (FIXED) */}
-                {p.employees.length > 0 && (
-                  <div className="flex items-center -space-x-2">
-                    {p.employees.map((emp) => (
-                      <Avatar
-                        key={emp.id}
-                        className="w-8 h-8 border-2 border-white"
-                      >
-                        <AvatarFallback>
-                          {emp.name?.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
-                  </div>
-                )}
+              {/* ACTIONS */}
+              {role === "manager" && (
+                <div className="col-span-2 flex justify-end gap-2">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setEdit(p)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
 
-                {/* Manager Actions */}
-                {role === "manager" && (
-                  <div className="flex gap-2 pt-2">
-                    <Button size="sm" onClick={() => setEdit(p)}>
-                      ✏️ Edit
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={async () => {
-                        await deleteProject(p.id);
-                        load();
-                      }}
-                    >
-                      🗑 Delete
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={async () => {
+                      await deleteProject(p.id);
+                      load();
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
 
       {/* ADD MODAL */}
       {add && (
