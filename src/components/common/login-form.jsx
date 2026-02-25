@@ -8,10 +8,16 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { loginEmployee } from "@/services/api";
+import { Spinner } from "@/components/ui/spinner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
@@ -21,31 +27,29 @@ const loginSchema = z.object({
 
 export default function LoginForm() {
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const onError = (errors) => {
-    if (errors.email) toast.error(errors.email.message);
-    else if (errors.password) toast.error(errors.password.message);
-  };
-
   const onSubmit = async (data) => {
     try {
+      setLoading(true);
+
       const result = await loginEmployee(data);
 
-      // Save employee info and token
       localStorage.setItem("employeeData", JSON.stringify(result));
       localStorage.setItem("token", result.token);
 
-      toast.success("Login successful!");
+      toast.success("Login successful");
 
-      // Redirect to employee dashboard
       router.push(`/employee/${result.id}`);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +57,10 @@ export default function LoginForm() {
     <div className="flex justify-center mt-20">
       <Card className="w-full max-w-md">
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
             <FieldGroup>
               <Controller
                 name="email"
@@ -61,8 +68,15 @@ export default function LoginForm() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Email</FieldLabel>
-                    <Input {...field} type="email" placeholder="Enter email" />
-                    {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="Enter email"
+                      disabled={loading}
+                    />
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -73,14 +87,32 @@ export default function LoginForm() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Password</FieldLabel>
-                    <Input {...field} type="password" placeholder="Enter password" />
-                    {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="Enter password"
+                      disabled={loading}
+                    />
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Login
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Spinner className="mr-2 h-4 w-4" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </FieldGroup>
           </form>
