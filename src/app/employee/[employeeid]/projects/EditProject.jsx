@@ -21,9 +21,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
+import { X } from "lucide-react"; // ✅ lucide-react icon
+
 import {
   updateProject,
   assignEmployeeToProject,
+  removeEmployeeFromProject, // ✅ IMPORT REMOVE
 } from "@/services/projectService";
 import { getEmployees } from "@/services/employee";
 
@@ -39,12 +42,12 @@ export default function EditProject({ project, onClose, onSuccess }) {
     status: "Ongoing",
   });
 
-  /* Load employees */
+  /* LOAD EMPLOYEES */
   useEffect(() => {
     getEmployees().then((data) => setEmployees(data || []));
   }, []);
 
-  /* Sync project */
+  /* SYNC PROJECT */
   useEffect(() => {
     if (!project) return;
 
@@ -64,7 +67,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
     setSelectKey((k) => k + 1);
   }, [project]);
 
-  /* Assign employee */
+  /* ASSIGN EMPLOYEE */
   const addEmployee = async (id) => {
     if (assignedIds.includes(id)) return;
 
@@ -77,7 +80,15 @@ export default function EditProject({ project, onClose, onSuccess }) {
     setSelectKey((k) => k + 1);
   };
 
-  /* Submit */
+  /* ❌ REMOVE EMPLOYEE */
+  const removeEmployee = async (id) => {
+    await removeEmployeeFromProject(project.id, id);
+
+    setAssignedIds((prev) => prev.filter((eid) => eid !== id));
+    setSelectKey((k) => k + 1);
+  };
+
+  /* SUBMIT PROJECT UPDATE */
   const submit = async () => {
     await updateProject(project.id, form);
     onSuccess();
@@ -88,9 +99,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            Edit Project
-          </DialogTitle>
+          <DialogTitle className="text-xl">Edit Project</DialogTitle>
           <DialogDescription>
             Update project details and manage assignments
           </DialogDescription>
@@ -171,8 +180,20 @@ export default function EditProject({ project, onClose, onSuccess }) {
               {assignedIds.map((id) => {
                 const emp = employees.find((e) => e.id === id);
                 return (
-                  <Badge key={id} variant="secondary">
+                  <Badge
+                    key={id}
+                    variant="secondary"
+                    className="flex items-center gap-1 pr-1"
+                  >
                     {emp?.name}
+
+                    {/* ❌ REMOVE ICON */}
+                    <button
+                      onClick={() => removeEmployee(id)}
+                      className="ml-1 rounded hover:bg-muted p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 );
               })}
@@ -210,9 +231,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={submit}>
-            Save Changes
-          </Button>
+          <Button onClick={submit}>Save Changes</Button>
         </div>
       </DialogContent>
     </Dialog>
