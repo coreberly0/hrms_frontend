@@ -21,15 +21,15 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 
 /* =========================
-   SCHEMA
+   SCHEMA (FIXED)
 ========================= */
 const employeeSchema = z.object({
-  name: z.string().min(1, "Required"),
-  email: z.string().email("Invalid email"),
-  position: z.string().min(1, "Required"),
+  name: z.string().min(1, "Full name is required"),
+  email: z.string().email("Invalid email address"),
+  position: z.string().min(1, "Role is required"),
   department: z.string().optional(),
-  salary: z.number().positive("Invalid"),
-  password: z.string().min(6, "Min 6 characters"),
+  salary: z.coerce.number().positive("Salary must be greater than 0"),
+  password: z.string().min(6, "Minimum 6 characters"),
   gender: z.enum(["male", "female", "other"]),
 });
 
@@ -49,7 +49,7 @@ export default function AddEmployee({ onClose, onSuccess }) {
       email: "",
       position: "",
       department: "",
-      salary: "",
+      salary: 0,
       password: "",
       gender: "male",
     },
@@ -60,11 +60,14 @@ export default function AddEmployee({ onClose, onSuccess }) {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await addEmployee({ ...data, salary: Number(data.salary) });
+
+      await addEmployee(data); // no manual Number() needed
+
       toast.success("Employee added successfully");
       onSuccess?.();
       onClose?.();
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to add employee");
     } finally {
       setLoading(false);
@@ -80,13 +83,11 @@ export default function AddEmployee({ onClose, onSuccess }) {
           </DialogTitle>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-6 space-y-6"
-        >
-          {/* GRID */}
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
+          
+          {/* FORM GRID */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            
+
             <FormField label="Full Name" error={errors.name?.message}>
               <Input
                 placeholder="Enter full name"
@@ -120,7 +121,7 @@ export default function AddEmployee({ onClose, onSuccess }) {
               <Input
                 type="number"
                 placeholder="50000"
-                {...register("salary", { valueAsNumber: true })}
+                {...register("salary")}
               />
             </FormField>
 
@@ -133,14 +134,14 @@ export default function AddEmployee({ onClose, onSuccess }) {
             </FormField>
           </div>
 
-          {/* GENDER */}
+          {/* GENDER TABS */}
           <div>
             <Label className="mb-2 block">Gender</Label>
             <div className="flex gap-3">
               {["male", "female", "other"].map((g) => (
                 <button
-                  type="button"
                   key={g}
+                  type="button"
                   onClick={() => setValue("gender", g)}
                   className={`px-4 py-2 rounded-md border text-sm capitalize transition
                     ${
@@ -155,7 +156,7 @@ export default function AddEmployee({ onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* ACTIONS */}
+          {/* ACTION BUTTONS */}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
@@ -184,7 +185,7 @@ export default function AddEmployee({ onClose, onSuccess }) {
 }
 
 /* =========================
-   FIELD
+   FORM FIELD
 ========================= */
 function FormField({ label, error, children }) {
   return (
