@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   CalendarCheck,
   FileText,
-  FolderKanban
+  FolderKanban,
+  LogOut,
+  User
 } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -19,10 +22,17 @@ import {
 } from "@/components/ui/sidebar";
 
 export function EmpSidebar() {
+  const router = useRouter();
   const pathname = usePathname();
   const empId = pathname.split("/")[2];
 
   if (!empId) return null;
+
+  const handleLogout = () => {
+    localStorage.removeItem("employeeData");
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
 
   return (
     <Sidebar className="bg-slate-900 text-white">
@@ -97,8 +107,38 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
+          {/* Profile */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/ProfileDashboard`)}
+            >
+              <Link
+                href={`/employee/${empId}/ProfileDashboard`}
+                className="flex gap-3 px-4 py-2"
+              >
+                <User className="h-5 w-5" />
+                Profile
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
         </SidebarMenu>
       </SidebarContent>
+
+      <SidebarFooter className="bg-slate-900 border-t border-[#1C225B]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              className="text-red-200 hover:text-red-100"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
