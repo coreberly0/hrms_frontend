@@ -1,122 +1,148 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { getEmployeeById } from "@/services/employee";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+"use client"
 
 import {
-  Mail,
-  Phone,
-  Briefcase,
-  IndianRupee,
-  Calendar,
-  MapPin,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 
-export default function EmployeeProfile({ employeeid }) {
-  const [emp, setEmp] = useState(null);
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts"
 
-  useEffect(() => {
-    if (!employeeid) return;
-    getEmployeeById(employeeid).then(setEmp);
-  }, [employeeid]);
+import { CheckCircle, Clock, FolderKanban } from "lucide-react"
 
-  if (!emp) return null;
+const data = [
+  { name: "Completed", value: 5 },
+  { name: "In Progress", value: 3 },
+  { name: "Pending", value: 2 },
+]
 
+const COLORS = ["#22c55e", "#3b82f6", "#f59e0b"]
+
+export default function EmployeeDashboard() {
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+    <div className="p-6 space-y-6 bg-slate-50 min-h-screen">
 
-        {/* ===== LEFT CONTENT ===== */}
-        <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-8">
+      {/* ===== HEADER ===== */}
+      <div>
+        <h1 className="text-2xl font-bold">Welcome Back, Kishore 👋</h1>
+        <p className="text-muted-foreground text-sm">
+          Here’s your work summary for today
+        </p>
+      </div>
 
-          <Section title="Personal Details">
-            <Row icon={Mail} label="Email" value={emp.email} />
-            <Row icon={Phone} label="Phone" value={emp.personal_phone} />
-            <Row label="Gender" value={emp.gender} />
-            <Row label="Marital Status" value={emp.marital_status} />
-          </Section>
+      {/* ===== STATS CARDS ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-          <Section title="Employment Information">
-            <Row icon={Briefcase} label="Role" value={emp.role} />
-            <Row icon={IndianRupee} label="Salary" value={`₹ ${emp.salary}`} />
-            <Row icon={Calendar} label="Joining Date" value={emp.joining_date} />
-          </Section>
-
-          <Section title="Address">
-            <div className="flex items-start gap-3 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 mt-1" />
-              <p>
-                {emp.door_no}, {emp.street}, {emp.area}, <br />
-                {emp.city}, {emp.state} - {emp.pincode}
+        <Card className="rounded-2xl shadow-sm">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Active Projects
               </p>
+              <h2 className="text-2xl font-bold">3</h2>
             </div>
-          </Section>
+            <FolderKanban className="text-blue-500 h-8 w-8" />
+          </CardContent>
+        </Card>
 
-        </div>
+        <Card className="rounded-2xl shadow-sm">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Tasks Completed
+              </p>
+              <h2 className="text-2xl font-bold">5</h2>
+            </div>
+            <CheckCircle className="text-green-500 h-8 w-8" />
+          </CardContent>
+        </Card>
 
-        {/* ===== RIGHT SIDEBAR ===== */}
-        <div className="lg:col-span-4 bg-slate-900 text-white p-6 sm:p-8 flex flex-col items-center text-center space-y-6">
-
-          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white">
-            <AvatarFallback className="text-3xl font-bold bg-slate-700">
-              {emp.name?.[0]}
-            </AvatarFallback>
-          </Avatar>
-
-          <div>
-            <h2 className="text-xl sm:text-2xl font-semibold">
-              {emp.name}
-            </h2>
-            <p className="text-slate-300 text-sm mt-1">
-              {emp.position}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">
-              ID: {emp.employee_id}
-            </p>
-          </div>
-
-          <Badge className="bg-green-500 text-white px-4 py-1">
-            {emp.status}
-          </Badge>
-
-          <Separator className="bg-slate-700 w-full" />
-
-          <div className="text-sm text-slate-300 space-y-2">
-            <p>{emp.department}</p>
-            <p>{emp.company_name}</p>
-          </div>
-
-        </div>
+        <Card className="rounded-2xl shadow-sm">
+          <CardContent className="p-5 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Pending Tasks
+              </p>
+              <h2 className="text-2xl font-bold">2</h2>
+            </div>
+            <Clock className="text-yellow-500 h-8 w-8" />
+          </CardContent>
+        </Card>
 
       </div>
-    </div>
-  );
-}
 
-/* ===== SECTION ===== */
-function Section({ title, children }) {
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
-}
+      {/* ===== MAIN GRID ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-/* ===== ROW ===== */
-function Row({ icon: Icon, label, value }) {
-  return (
-    <div className="flex justify-between items-center border-b pb-2 text-sm gap-4">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        {Icon && <Icon className="h-4 w-4" />}
-        {label}
+        {/* ===== TASK STATUS PIE ===== */}
+        <Card className="lg:col-span-1 rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>Project Status</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  outerRadius={80}
+                  label
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={index} fill={COLORS[index]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* ===== CURRENT WORK ===== */}
+        <Card className="lg:col-span-2 rounded-2xl shadow-sm">
+          <CardHeader>
+            <CardTitle>Current Work</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+
+            <div className="p-4 bg-slate-100 rounded-xl">
+              ✔ Completed “Login Page UI”
+            </div>
+
+            <div className="p-4 bg-blue-50 text-blue-700 rounded-xl">
+              🛠 Working on “Payroll API integration”
+            </div>
+
+            <div className="p-4 bg-yellow-50 text-yellow-700 rounded-xl">
+              📁 Assigned to “Inventory App”
+            </div>
+
+          </CardContent>
+        </Card>
+
       </div>
-      <span className="font-medium text-right break-all">
-        {value || "-"}
-      </span>
+
+      {/* ===== RECENT ACTIVITY ===== */}
+      <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <p>• Updated project documentation</p>
+          <p>• Fixed authentication bug</p>
+          <p>• Attended sprint meeting</p>
+        </CardContent>
+      </Card>
+
     </div>
-  );
+  )
 }
