@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { Spinner } from "@/components/ui/spinner";
 
 import {
   updateProject,
@@ -35,6 +35,7 @@ import { getEmployees } from "@/services/employee";
 export default function EditProject({ project, onClose, onSuccess }) {
   const [employees, setEmployees] = useState([]);
   const [assignedIds, setAssignedIds] = useState([]);
+  const [initialAssignedIds, setInitialAssignedIds] = useState([]);
   const [selectKey, setSelectKey] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +51,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
     getEmployees().then((data) => setEmployees(data || []));
   }, []);
 
-  /* SYNC PROJECT */
+  /* SYNC PROJECT DATA */
   useEffect(() => {
     if (!project) return;
 
@@ -61,57 +62,63 @@ export default function EditProject({ project, onClose, onSuccess }) {
       status: project.status || "Ongoing",
     });
 
-    setAssignedIds(
-      Array.isArray(project.employees)
-        ? project.employees.map((e) => e.id)
-        : []
-    );
+    const ids = Array.isArray(project.employees)
+      ? project.employees.map((e) => e.id)
+      : [];
 
+    setAssignedIds(ids);
+    setInitialAssignedIds(ids);
     setSelectKey((k) => k + 1);
   }, [project]);
 
-  /* ASSIGN EMPLOYEE */
-  const addEmployee = async (id) => {
+  /* LOCAL ADD */
+  const addEmployee = (id) => {
     if (assignedIds.includes(id)) return;
-
-    try {
-      await assignEmployeeToProject({
-        project_id: project.id,
-        employee_id: id,
-      });
-
-      setAssignedIds((prev) => [...prev, id]);
-      toast.success("Employee assigned");
-    } catch {
-      toast.error("Failed to assign employee");
-    } finally {
-      setSelectKey((k) => k + 1);
-    }
+    setAssignedIds((prev) => [...prev, id]);
+    setSelectKey((k) => k + 1);
   };
 
-  /* REMOVE EMPLOYEE */
-  const removeEmployee = async (id) => {
-    try {
-      await removeEmployeeFromProject(project.id, id);
-      setAssignedIds((prev) => prev.filter((eid) => eid !== id));
-      toast.success("Employee removed");
-    } catch {
-      toast.error("Failed to remove employee");
-    } finally {
-      setSelectKey((k) => k + 1);
-    }
+  /* LOCAL REMOVE */
+  const removeEmployee = (id) => {
+    setAssignedIds((prev) => prev.filter((eid) => eid !== id));
+    setSelectKey((k) => k + 1);
   };
 
-  /* SAVE PROJECT */
+  /* FAST SAVE (PARALLEL API CALLS) */
   const submit = async () => {
     try {
       setLoading(true);
+
+      // 1️⃣ Update project details
       await updateProject(project.id, form);
+
+      // 2️⃣ Calculate changes
+      const added = assignedIds.filter(
+        (id) => !initialAssignedIds.includes(id)
+      );
+
+      const removed = initialAssignedIds.filter(
+        (id) => !assignedIds.includes(id)
+      );
+
+      // 3️⃣ Run assign/remove in parallel
+      await Promise.all([
+        ...added.map((id) =>
+          assignEmployeeToProject({
+            project_id: project.id,
+            employee_id: id,
+          })
+        ),
+        ...removed.map((id) =>
+          removeEmployeeFromProject(project.id, id)
+        ),
+      ]);
 
       toast.success("Project updated successfully");
       onSuccess();
       onClose();
-    } catch {
+    } catch (error) {
+      console.error(error);
       toast.error("Failed to update project");
     } finally {
       setLoading(false);
@@ -128,6 +135,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
           </DialogDescription>
         </DialogHeader>
 
+        {/* PROJECT DETAILS */}
         <div className="space-y-3">
           <Input
             placeholder="Project Name"
@@ -161,6 +169,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
 
         <Separator />
 
+        {/* STATUS */}
         <Select
           value={form.status}
           onValueChange={(value) =>
@@ -180,6 +189,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
 
         <Separator />
 
+        {/* ASSIGNED EMPLOYEES */}
         <div className="space-y-3">
           {assignedIds.length === 0 ? (
             <p className="text-sm text-muted-foreground">
@@ -197,9 +207,10 @@ export default function EditProject({ project, onClose, onSuccess }) {
                   >
                     {emp?.name}
                     <button
+                      type="button"
                       onClick={() => removeEmployee(id)}
-                      className="ml-1 rounded hover:bg-muted p-0.5"
                       disabled={loading}
+                      className="ml-1 rounded hover:bg-muted p-0.5"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -231,6 +242,7 @@ export default function EditProject({ project, onClose, onSuccess }) {
           </Select>
         </div>
 
+        {/* ACTION BUTTONS */}
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
