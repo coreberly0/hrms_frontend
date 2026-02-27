@@ -8,7 +8,8 @@ import {
   FileText,
   FolderKanban,
   LogOut,
-  User
+  User,
+  Users
 } from "lucide-react";
 
 import {
@@ -71,6 +72,22 @@ export function EmpSidebar() {
               >
                 <CalendarCheck className="h-5 w-5" />
                 Attendance
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* EmployeeList */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/employeeList`)}
+            >
+              <Link
+                href={`/employee/${empId}/employeeList`}
+                className="flex gap-3 px-4 py-2"
+              >
+                <Users className="h-5 w-5" />
+                Employee List
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
