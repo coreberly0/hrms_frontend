@@ -1,20 +1,68 @@
 const API_URL = "https://hrms-backend-0r5r.onrender.com";
 
 const request = async (endpoint) => {
-  const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    if (!token) {
+      console.warn("No authentication token found");
+      return null;
+    }
 
-  if (!res.ok) throw new Error("Request failed");
-  return res.json();
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `API Error: ${res.status} ${res.statusText}`
+      );
+    }
+    return res.json();
+  } catch (error) {
+    console.log("API Request Error:", error.message);
+    return null;
+  }
 };
 
-export const getEmployeeById = (id) =>
-  request(`/employees/${id}`);
+const normalizeEmployee = (payload) => {
+  let raw = payload;
+
+  if (Array.isArray(raw)) {
+    raw = raw[0];
+  }
+
+  if (raw && typeof raw === "object") {
+    if (raw.employee) raw = raw.employee;
+    if (raw.data) raw = raw.data;
+  }
+
+  if (!raw || typeof raw !== "object") {
+    return raw;
+  }
+
+  const normalized = { ...raw };
+
+  if (!normalized.name && raw.employeeName) normalized.name = raw.employeeName;
+  if (!normalized.employee_id && raw.employeeCode) normalized.employee_id = raw.employeeCode;
+  if (!normalized.position && raw.designation) normalized.position = raw.designation;
+  if (!normalized.position && raw.role) normalized.position = raw.role;
+  if (!normalized.role && raw.role) normalized.role = raw.role;
+  if (!normalized.role && raw.position) normalized.role = raw.position;
+  if (!normalized.department && raw.department) normalized.department = raw.department;
+  if (!normalized.email && raw.email) normalized.email = raw.email;
+  if (!normalized.profile_image && raw.profileImage) normalized.profile_image = raw.profileImage;
+
+  return normalized;
+};
+
+export const getEmployeeById = async (id) => {
+  const data = await request(`/employees/${id}`);
+  return normalizeEmployee(data);
+};
 
 export const getEmployees = () =>
   request("/employees");
