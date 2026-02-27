@@ -8,6 +8,8 @@ import { Clock, LogIn, LogOut, Sparkles, Coffee, CheckCircle, ListTodo, Award, T
 import { getEmployeeById } from "@/services/employee";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import HRAnalytics from "@/components/dashboard/HRAnalytics";
+import ManagerAnalytics from "@/components/dashboard/ManagerAnalytics";
 
 export default function EmployeeDashboard({ employeeid }) {
   const [mounted, setMounted] = useState(false);
@@ -17,6 +19,7 @@ export default function EmployeeDashboard({ employeeid }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [duration, setDuration] = useState(null);
   const [employee, setEmployee] = useState(null);
+  const [employeeFromAPI, setEmployeeFromAPI] = useState(null);
 
 
   // Set mounted flag to prevent hydration errors
@@ -78,6 +81,25 @@ export default function EmployeeDashboard({ employeeid }) {
     }
   }, [employeeid, mounted]);
 
+  // Fetch employee role from API
+  useEffect(() => {
+    const fetchEmployeeFromAPI = async () => {
+      try {
+        const res = await fetch(`/api/employees/${employeeid}`);
+        if (res.ok) {
+          const data = await res.json();
+          setEmployeeFromAPI(data[0] || data);
+        }
+      } catch (err) {
+        console.log("Error fetching from API:", err.message);
+      }
+    };
+
+    if (mounted && employeeid) {
+      fetchEmployeeFromAPI();
+    }
+  }, [employeeid, mounted]);
+
   const handleClockIn = () => {
     const now = new Date();
     setClockInTime(now);
@@ -125,7 +147,7 @@ export default function EmployeeDashboard({ employeeid }) {
                       Welcome back! 👋
                     </h2>
                     <p className="text-2xl font-bold text-primary-700 mt-2">
-                      {employee?.name || "Employee"}
+                      {employeeFromAPI?.employeeName || employee?.name || ""}
                     </p>
                   </div>
                   <Sparkles className="h-8 w-8 text-primary-600 shrink-0" />
@@ -238,6 +260,19 @@ export default function EmployeeDashboard({ employeeid }) {
       </div>
 
       {/* Second Row - Analytics */}
+      {(() => {
+        const empData = employeeFromAPI || employee;
+        const role = empData?.role ? empData.role.toLowerCase().trim() : "";
+
+        if (role === "hr") {
+          return <HRAnalytics />;
+        }
+
+        if (role === "manager") {
+          return <ManagerAnalytics />;
+        }
+
+        return (
       <div className="flex gap-4 w-full">
         
         {/* Task & Productivity */}
@@ -393,6 +428,8 @@ export default function EmployeeDashboard({ employeeid }) {
           </Card>
         </div>
       </div>
+        );
+      })()}
 
     </div>
   );

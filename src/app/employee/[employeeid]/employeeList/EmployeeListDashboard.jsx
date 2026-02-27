@@ -49,7 +49,7 @@ export default function EmployeeListDashboard() {
     try {
       setLoading(true);
       const data = await getEmployees();
-      setEmployees(Array.isArray(data) ? data : data.employees || []);
+      setEmployees(Array.isArray(data) ? data : (data?.employees || []));
     } finally {
       setLoading(false);
     }

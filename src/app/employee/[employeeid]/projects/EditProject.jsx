@@ -48,7 +48,30 @@ export default function EditProject({ project, onClose, onSuccess }) {
 
   /* LOAD EMPLOYEES */
   useEffect(() => {
-    getEmployees().then((data) => setEmployees(data || []));
+    const loadEmployees = async () => {
+      try {
+        // Try local API first
+        let data = null;
+        try {
+          const res = await fetch("/api/employees");
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch (err) {
+          console.log("Local API failed, trying external API...", err.message);
+        }
+
+        // Fallback to external API
+        if (!data) {
+          data = await getEmployees();
+        }
+
+        setEmployees(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.log("Failed to load employees:", err.message);
+      }
+    };
+    loadEmployees();
   }, []);
 
   /* SYNC PROJECT DATA */

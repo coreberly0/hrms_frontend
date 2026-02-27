@@ -82,13 +82,43 @@ export default function ProjectDashboard({ employeeid }) {
       setLoading(true);
 
       const emp = await getEmployeeById(employeeid);
-      const empRole = emp.role.toLowerCase();
+      const empRole = emp?.role ? emp.role.toLowerCase() : (emp?.position ? emp.position.toLowerCase() : "employee");
       setRole(empRole);
 
-      const data =
-        empRole === "manager"
-          ? await getAllProjects()
-          : await getProjectsByEmployee(employeeid);
+      let data = null;
+
+      // Try local API first
+      try {
+        const localRes = await fetch("/api/projects");
+        if (localRes.ok) {
+          const allProjects = await localRes.json();
+          if (empRole === "manager") {
+            data = allProjects;
+          } else {
+            // Filter projects by employee
+            data = allProjects.filter(p =>
+              p.employees?.some(e => e.id === employeeid)
+            );
+          }
+        }
+      } catch (err) {
+        console.log("Local API failed, trying external API...", err.message);
+      }
+
+      // Fallback to external API if local didn't work
+      if (!data && empRole === "manager") {
+        try {
+          data = await getAllProjects();
+        } catch (err) {
+          console.log("External API error:", err.message);
+        }
+      } else if (!data) {
+        try {
+          data = await getProjectsByEmployee(employeeid);
+        } catch (err) {
+          console.log("External API error:", err.message);
+        }
+      }
 
       setProjects(
         (data || []).map((p) => ({

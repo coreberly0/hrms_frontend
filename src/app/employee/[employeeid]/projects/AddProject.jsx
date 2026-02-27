@@ -61,9 +61,25 @@ export default function AddProject({ onClose, onSuccess }) {
   React.useEffect(() => {
     const loadEmployees = async () => {
       try {
-        const data = await getEmployees();
+        // Try local API first
+        let data = null;
+        try {
+          const res = await fetch("/api/employees");
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch (err) {
+          console.log("Local API failed, trying external API...", err.message);
+        }
+
+        // Fallback to external API
+        if (!data) {
+          data = await getEmployees();
+        }
+
         setEmployees(Array.isArray(data) ? data : []);
-      } catch {
+      } catch (err) {
+        console.log("Failed to load employees:", err.message);
         toast.error("Failed to load employees");
       }
     };

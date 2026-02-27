@@ -12,6 +12,7 @@ import { User, Briefcase, Building2, Hash } from 'lucide-react'
 export default function Layout({children}) {
   const pathname = usePathname()
   const [employee, setEmployee] = useState(null)
+  const [employeeFromAPI, setEmployeeFromAPI] = useState(null)
   const [mounted, setMounted] = useState(false)
 
   // Prevent hydration errors
@@ -25,6 +26,20 @@ export default function Layout({children}) {
       const match = pathname.match(/\/employee\/([^/]+)/)
       if (match) {
         const employeeid = match[1]
+        
+        // Fetch from local API first
+        try {
+          const res = await fetch(`/api/employees/${employeeid}`)
+          if (res.ok) {
+            const data = await res.json()
+            const empData = data[0] || data
+            setEmployeeFromAPI(empData)
+          }
+        } catch (err) {
+          console.log("Error fetching from local API:", err.message)
+        }
+        
+        // Also fetch from external API
         const data = await getEmployeeById(employeeid)
         if (data) {
           setEmployee(data)
@@ -36,6 +51,9 @@ export default function Layout({children}) {
       fetchEmployee()
     }
   }, [pathname, mounted])
+
+  // Merge employee data - prefer local API data
+  const empData = employeeFromAPI || employee
 
   return (
     <SidebarProvider>
@@ -51,9 +69,9 @@ export default function Layout({children}) {
               <DropdownMenuTrigger asChild>
                 <button className="focus:outline-none">
                   <Avatar size="lg" className="cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                    <AvatarImage src={employee?.profile_image || ""} />
+                    <AvatarImage src={empData?.profile_image || empData?.profileImage || ""} />
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {employee?.name?.[0] || "U"}
+                      {empData?.name?.[0] || empData?.employeeName?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </button>
@@ -63,14 +81,14 @@ export default function Layout({children}) {
                 {/* Header with Avatar */}
                 <div className="flex items-center gap-3 pb-3 border-b">
                   <Avatar size="lg">
-                    <AvatarImage src={employee?.profile_image || "#"} />
+                    <AvatarImage src={empData?.profile_image || empData?.profileImage || "#"} />
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {employee?.name?.[0] || "U"}
+                      {empData?.name?.[0] || empData?.employeeName?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm">{employee?.name || "Loading..."}</h3>
-                    <p className="text-xs text-muted-foreground">{employee?.email || "#"}</p>
+                    <h3 className="font-semibold text-sm">{empData?.employeeName || empData?.name || "Loading..."}</h3>
+                    <p className="text-xs text-muted-foreground">{empData?.email || "#"}</p>
                   </div>
                 </div>
                 
@@ -80,7 +98,7 @@ export default function Layout({children}) {
                     <User className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground">Name</p>
-                      <p className="text-sm font-medium">{employee?.name || "-"}</p>
+                      <p className="text-sm font-medium">{empData?.employeeName || empData?.name || "-"}</p>
                     </div>
                   </div>
                   
@@ -88,7 +106,7 @@ export default function Layout({children}) {
                     <Hash className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground">Employee ID</p>
-                      <p className="text-sm font-medium">{employee?.employee_id || "-"}</p>
+                      <p className="text-sm font-medium">{empData?.employeeCode || empData?.employee_id || "-"}</p>
                     </div>
                   </div>
                   
@@ -96,7 +114,7 @@ export default function Layout({children}) {
                     <Building2 className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground">Department</p>
-                      <p className="text-sm font-medium">{employee?.department || "-"}</p>
+                      <p className="text-sm font-medium">{empData?.department || "-"}</p>
                     </div>
                   </div>
                   
@@ -104,7 +122,7 @@ export default function Layout({children}) {
                     <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground">Role</p>
-                      <p className="text-sm font-medium">{employee?.position || employee?.role || "-"}</p>
+                      <p className="text-sm font-medium">{empData?.designation || empData?.position || empData?.role || "-"}</p>
                     </div>
                   </div>
                 </div>

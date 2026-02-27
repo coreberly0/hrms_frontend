@@ -2,21 +2,14 @@ import { NextResponse } from "next/server";
 
 const employeeLogs = [
   {
-    // 🔑 AUTH / ROUTING
-    id: "emp1",
-
-    // 🪪 EMPLOYEE INFO
-    employeeCode: "EMP-39394",
+    id: "8",
+    employeeCode: "EMP-00001",
     employeeName: "Kishore",
     gender: "Male",
     maritalStatus: "Married",
-
-    // 📞 CONTACT DETAILS
     personalPhone: "9876543210",
     alternatePhone: "9123456789",
-    email: "arun.kumar@techcorp.com",
-
-    // 🏠 ADDRESS
+    email: "kishore@corberly.com",
     address: {
       doorNo: "12A",
       street: "MG Road",
@@ -25,34 +18,28 @@ const employeeLogs = [
       state: "Tamil Nadu",
       pincode: "600017",
     },
-
-    // 🏢 COMPANY DETAILS
-    department: "Engineering",
-    designation: "Software Engineer",
-    role: "employee",
+    department: "IT",
+    designation: "Developer",
+    role: "developer",
     salary: 35000,
     companyId: "1",
-    companyName: "TechCorp",
+    companyName: "Corberly",
     joiningDate: "2024-06-15",
-
-    // 📅 ATTENDANCE
-    date: "2026-02-05",
+    date: "2026-02-27",
     loginTime: "09:10 AM",
     logoutTime: "06:05 PM",
     status: "Present",
   },
 
   {
-    id: "emp2",
-    employeeCode: "EMP-39394",
-    employeeName: "Reshma",
+    id: "9",
+    employeeCode: "EMP-00002",
+    employeeName: "Kani",
     gender: "Female",
     maritalStatus: "UnMarried",
-
     personalPhone: "9876543210",
     alternatePhone: "9123456789",
-    email: "reshmashanmugam1234@gmail.com",
-
+    email: "kani@corberly.com",
     address: {
       doorNo: "12A",
       street: "MG Road",
@@ -61,33 +48,28 @@ const employeeLogs = [
       state: "Tamil Nadu",
       pincode: "600017",
     },
-
-    department: "Engineering",
-    designation: "Software Engineer",
-    role: "employee",
-    salary: 35000,
+    department: "HR",
+    designation: "HR Executive",
+    role: "hr",
+    salary: 32000,
     companyId: "1",
-    companyName: "TechCorp",
-    joiningDate: "2024-06-15",
-
-    date: "2026-02-04",
+    companyName: "Corberly",
+    joiningDate: "2024-09-15",
+    date: "2026-02-27",
     loginTime: "09:20 AM",
     logoutTime: "06:00 PM",
     status: "Present",
   },
 
-  // 👇 Another employee
   {
-    id: "emp3",
-    employeeCode: "EMP-40211",
-    employeeName: "Bala Murugan",
-    gender: "Male",
-    maritalStatus: "Single",
-
-    personalPhone: "9000012345",
-    alternatePhone: "9000098765",
-    email: "bala.murugan@techcorp.com",
-
+    id: "10",
+    employeeCode: "EMP-00003",
+    employeeName: "Reshma",
+    gender: "Female",
+    maritalStatus: "UnMarried",
+    personalPhone: "9876543210",
+    alternatePhone: "9123456789",
+    email: "reshma@corberly.com",
     address: {
       doorNo: "7B",
       street: "Anna Nagar West",
@@ -96,19 +78,17 @@ const employeeLogs = [
       state: "Tamil Nadu",
       pincode: "625020",
     },
-
-    department: "QA",
-    designation: "QA Engineer",
-    role: "employee",
-    salary: 28000,
+    department: "HR",
+    designation: "Manager",
+    role: "manager",
+    salary: 38000,
     companyId: "1",
-    companyName: "TechCorp",
-    joiningDate: "2025-01-10",
-
-    date: "2026-02-05",
-    loginTime: null,
-    logoutTime: null,
-    status: "Absent",
+    companyName: "Corberly",
+    joiningDate: "2024-03-15",
+    date: "2026-02-27",
+    loginTime: "09:15 AM",
+    logoutTime: "06:10 PM",
+    status: "Present",
   },
 ];
 
