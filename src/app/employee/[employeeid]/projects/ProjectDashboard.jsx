@@ -73,11 +73,9 @@ export default function ProjectDashboard({ employeeid }) {
   const [add, setAdd] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* DELETE CONFIRM */
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  /* PAGINATION */
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -109,6 +107,7 @@ export default function ProjectDashboard({ employeeid }) {
         (data || []).map((p) => ({
           ...p,
           employees: Array.isArray(p.employees) ? p.employees : [],
+          createdDate: p.created_at || p.createdAt || null, // ✅ FIXED DATE
         }))
       );
     } finally {
@@ -131,7 +130,6 @@ export default function ProjectDashboard({ employeeid }) {
     }
   };
 
-  /* LOADING */
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -186,10 +184,18 @@ export default function ProjectDashboard({ employeeid }) {
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </div>
 
+              {/* PROJECT + DATE */}
               <div className="col-span-3">
                 <div className="font-semibold">{p.project_name}</div>
                 <div className="text-xs text-muted-foreground">
-                  ID: {p.id}
+                  ID: {p.id} •{" "}
+                  {p.createdDate
+                    ? new Date(p.createdDate).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "No date"}
                 </div>
               </div>
 
@@ -287,9 +293,7 @@ export default function ProjectDashboard({ employeeid }) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Delete project?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Delete project?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. Project{" "}
               <b>{deleteTarget?.project_name}</b> will be permanently deleted.
