@@ -27,6 +27,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 import { Plus, Pencil, Trash2, Wallet } from "lucide-react";
 
 /* ---------------- STATUS STEPS ---------------- */
@@ -61,6 +72,10 @@ export default function ProjectDashboard({ employeeid }) {
   const [edit, setEdit] = useState(null);
   const [add, setAdd] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  /* DELETE CONFIRM */
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   /* PAGINATION */
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,6 +120,17 @@ export default function ProjectDashboard({ employeeid }) {
     load();
   }, [employeeid]);
 
+  const confirmDelete = async () => {
+    try {
+      setDeleting(true);
+      await deleteProject(deleteTarget.id);
+      setDeleteTarget(null);
+      load();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   /* LOADING */
   if (loading) {
     return (
@@ -115,7 +141,6 @@ export default function ProjectDashboard({ employeeid }) {
   }
 
   return (
-    /* MAIN CONTAINER — FULL HEIGHT */
     <div className="flex flex-col h-[calc(100vh-85px)] p-6 gap-4">
       {/* HEADER */}
       <div className="flex items-center justify-between">
@@ -149,94 +174,75 @@ export default function ProjectDashboard({ employeeid }) {
         )}
       </div>
 
-      {/* SCROLLABLE LIST */}
+      {/* LIST */}
       <ScrollArea className="flex-1 pr-2">
         <div className="space-y-2">
-          {paginatedProjects.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">
-              No projects found
-            </div>
-          ) : (
-            paginatedProjects.map((p, index) => (
-              <div
-                key={p.id}
-                className="grid grid-cols-12 items-center border rounded-lg px-4 py-4 bg-background hover:bg-gray-100 transition"
-              >
-                <div className="col-span-1 text-sm text-muted-foreground">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </div>
-
-                <div className="col-span-3">
-                  <div className="font-semibold">{p.project_name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    ID: {p.id} •{" "}
-                    {new Date(p.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-
-                <div className="col-span-2">
-                  <Badge
-                    className={
-                      p.status === "Completed"
-                        ? "bg-green-500"
-                        : p.status === "Ongoing"
-                        ? "bg-blue-500"
-                        : "bg-yellow-400 text-black"
-                    }
-                  >
-                    {p.status}
-                  </Badge>
-                </div>
-
-                <div className="col-span-2 flex items-center gap-2">
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                  ₹{Number(p.budget || 0).toLocaleString()}
-                </div>
-
-                <div className="col-span-2">
-                  <StatusSteps status={p.status} />
-                </div>
-
-                <div className="col-span-1 flex -space-x-2">
-                  {p.employees.map((e) => (
-                    <Avatar key={e.id} className="h-7 w-7">
-                      <AvatarFallback>
-                        {e.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-
-                {role === "manager" && (
-                  <div className="col-span-1 flex justify-end gap-2">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => setEdit(p)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={async () => {
-                        await deleteProject(p.id);
-                        load();
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
+          {paginatedProjects.map((p, index) => (
+            <div
+              key={p.id}
+              className="grid grid-cols-12 items-center border rounded-lg px-4 py-4 hover:bg-gray-100 transition"
+            >
+              <div className="col-span-1 text-muted-foreground">
+                {(currentPage - 1) * itemsPerPage + index + 1}
               </div>
-            ))
-          )}
+
+              <div className="col-span-3">
+                <div className="font-semibold">{p.project_name}</div>
+                <div className="text-xs text-muted-foreground">
+                  ID: {p.id}
+                </div>
+              </div>
+
+              <div className="col-span-2">
+                <Badge>{p.status}</Badge>
+              </div>
+
+              <div className="col-span-2 flex gap-2">
+                <Wallet className="h-4 w-4" />
+                ₹{Number(p.budget || 0).toLocaleString()}
+              </div>
+
+              <div className="col-span-2">
+                <StatusSteps status={p.status} />
+              </div>
+
+              <div className="col-span-1 flex -space-x-2">
+                {p.employees.map((e) => (
+                  <Avatar key={e.id} className="h-7 w-7">
+                    <AvatarFallback>
+                      {e.name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+
+              {role === "manager" && (
+                <div className="col-span-1 flex justify-end gap-2">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setEdit(p)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => setDeleteTarget(p)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </ScrollArea>
 
-      {/* PAGINATION — FIXED BOTTOM */}
+      {/* PAGINATION */}
       {projects.length > itemsPerPage && (
-        <div className="mt-auto flex justify-center bg-background">
+        <div className="mt-auto flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -273,6 +279,37 @@ export default function ProjectDashboard({ employeeid }) {
           </Pagination>
         </div>
       )}
+
+      {/* DELETE CONFIRM */}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete project?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Project{" "}
+              <b>{deleteTarget?.project_name}</b> will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* MODALS */}
       {add && (
