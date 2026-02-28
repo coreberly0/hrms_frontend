@@ -73,14 +73,15 @@ export default function ProjectDashboard({ employeeid }) {
   const [add, setAdd] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  /* DELETE CONFIRM */
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  /* PAGINATION */
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
   const totalPages = Math.ceil(projects.length / itemsPerPage);
-
   const paginatedProjects = projects.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -90,6 +91,7 @@ export default function ProjectDashboard({ employeeid }) {
     if (currentPage > totalPages) setCurrentPage(1);
   }, [projects, totalPages, currentPage]);
 
+  /* LOAD DATA */
   const load = async () => {
     try {
       setLoading(true);
@@ -107,7 +109,7 @@ export default function ProjectDashboard({ employeeid }) {
         (data || []).map((p) => ({
           ...p,
           employees: Array.isArray(p.employees) ? p.employees : [],
-          createdDate: p.created_at || p.createdAt || null, // ✅ FIXED DATE
+          createdDate: p.created_at || p.createdAt || null,
         }))
       );
     } finally {
@@ -130,6 +132,7 @@ export default function ProjectDashboard({ employeeid }) {
     }
   };
 
+  /* LOADING */
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -199,29 +202,42 @@ export default function ProjectDashboard({ employeeid }) {
                 </div>
               </div>
 
+              {/* STATUS BADGE — COLOR FIXED */}
               <div className="col-span-2">
-                <Badge>{p.status}</Badge>
+                <Badge
+                  className={
+                    p.status === "Completed"
+                      ? "bg-green-500"
+                      : p.status === "Ongoing"
+                      ? "bg-blue-500"
+                      : "bg-yellow-400 text-black"
+                  }
+                >
+                  {p.status}
+                </Badge>
               </div>
 
+              {/* BUDGET */}
               <div className="col-span-2 flex gap-2">
                 <Wallet className="h-4 w-4" />
                 ₹{Number(p.budget || 0).toLocaleString()}
               </div>
 
+              {/* PROGRESS */}
               <div className="col-span-2">
                 <StatusSteps status={p.status} />
               </div>
 
+              {/* TEAM */}
               <div className="col-span-1 flex -space-x-2">
                 {p.employees.map((e) => (
                   <Avatar key={e.id} className="h-7 w-7">
-                    <AvatarFallback>
-                      {e.name?.charAt(0)}
-                    </AvatarFallback>
+                    <AvatarFallback>{e.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 ))}
               </div>
 
+              {/* ACTIONS */}
               {role === "manager" && (
                 <div className="col-span-1 flex justify-end gap-2">
                   <Button
