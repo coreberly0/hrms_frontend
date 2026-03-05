@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getEmployeeById } from "@/services/employee";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 import {
   Mail,
@@ -13,16 +15,18 @@ import {
   IndianRupee,
   Calendar,
   MapPin,
+  Pencil,
 } from "lucide-react";
 
 export default function EmployeeProfileDashboard({ employeeid }) {
+  const router = useRouter();
   const [emp, setEmp] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Try local API immediately
+        // Try local API first
         try {
           const res = await fetch(`/api/employees/${employeeid}`);
           if (res.ok) {
@@ -53,6 +57,12 @@ export default function EmployeeProfileDashboard({ employeeid }) {
     }
   }, [employeeid]);
 
+  // Handle Edit click
+  const handleEdit = () => {
+    localStorage.setItem(`profileEditMode_${employeeid}`, "true");
+    router.push(`/employee/${employeeid}/profile-form`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -71,11 +81,25 @@ export default function EmployeeProfileDashboard({ employeeid }) {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+
+      {/* Edit Button — top right */}
+      <div className="max-w-6xl mx-auto mb-3 flex justify-end">
+        <Button
+          onClick={handleEdit}
+          variant="outline"
+          className="flex items-center gap-2 text-[#1C225B] border-[#1C225B] hover:bg-[#1C225B] hover:text-white transition-colors"
+        >
+          <Pencil className="h-4 w-4" />
+          Edit Profile
+        </Button>
+      </div>
+
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
 
-        {/* ===== LEFT CONTENT ===== */}
+        {/* LEFT CONTENT */}
         <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-8">
 
+          {/* Only fields that have API IDs — same as original */}
           <Section title="Personal Details">
             <Row icon={Mail} label="Email" value={emp.email} />
             <Row icon={Phone} label="Phone" value={emp.personal_phone || emp.personalPhone} />
@@ -101,7 +125,7 @@ export default function EmployeeProfileDashboard({ employeeid }) {
 
         </div>
 
-        {/* ===== RIGHT SIDEBAR ===== */}
+        {/* RIGHT SIDEBAR */}
         <div className="lg:col-span-4 bg-slate-900 text-white p-6 sm:p-8 flex flex-col items-center text-center space-y-6">
 
           <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white">
@@ -140,7 +164,6 @@ export default function EmployeeProfileDashboard({ employeeid }) {
   );
 }
 
-/* ===== SECTION ===== */
 function Section({ title, children }) {
   return (
     <div className="space-y-4">
@@ -150,7 +173,6 @@ function Section({ title, children }) {
   );
 }
 
-/* ===== ROW ===== */
 function Row({ icon: Icon, label, value }) {
   return (
     <div className="flex justify-between items-center border-b pb-2 text-sm gap-4">
