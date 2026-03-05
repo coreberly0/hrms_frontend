@@ -121,9 +121,9 @@ const Card = ({ icon, title, children }) => (
   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
     <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[#1C225B]/5 to-transparent">
       <span className="text-lg">{icon}</span>
-      <h2 className="text-sm font-extrabold text-[#1C225B] tracking-tight uppercase">{title}</h2>
+      <h2 className="text-sm font-extrabold text-slate-900 tracking-tight uppercase">{title}</h2>
     </div>
-    <div className="p-6">{children}</div>
+    <div className="p-4">{children}</div>
   </div>
 )
 
@@ -271,15 +271,15 @@ export default function EmployeeProfilePage() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-[#F4F6FB]">
+    <div className="min-h-screen w-full bg-[#F4F6FB]">
       <EmpSidebar />
 
-      <div className="flex-1 p-4 md:p-8 max-w-4xl mx-auto space-y-5 pb-16">
+      <div className="flex-1 p-4 md:p-6 space-y-5 pb-16">
 
         {/* Header */}
         <div className="flex items-start justify-between pt-2">
           <div>
-            <h1 className="text-2xl font-extrabold text-[#1C225B] tracking-tight">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               {isEditMode ? "Edit Profile" : "Complete Your Profile"}
             </h1>
             <p className="text-xs text-slate-400 mt-1">Fields marked <span className="text-rose-500">*</span> are mandatory</p>
@@ -304,8 +304,8 @@ export default function EmployeeProfilePage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
 
           {/* ── 1. PROFILE PICTURE ─────────────────────── */}
-          <Card icon="🖼️" title="Profile Picture">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+          <Card icon="" title="Profile Picture  " >
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <div
                 onClick={() => fileInputRef.current?.click()}
                 className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden cursor-pointer hover:border-[#1C225B] transition-colors flex-shrink-0 flex items-center justify-center"
@@ -319,7 +319,7 @@ export default function EmployeeProfilePage() {
               <div>
                 <button type="button" onClick={() => fileInputRef.current?.click()}
                   className="px-5 py-2.5 rounded-xl bg-[#1C225B] text-white text-sm font-bold hover:bg-[#141a47] transition-colors shadow-sm">
-                  Upload Photo
+                  Upload Photo  
                 </button>
                 <p className="text-xs text-slate-400 mt-2">JPG, PNG, WEBP • Max 5MB</p>
                 <p className="text-xs text-slate-400">Square image, min 200×200px recommended</p>
@@ -329,7 +329,7 @@ export default function EmployeeProfilePage() {
 
           {/* ── 2. PERSONAL INFORMATION ────────────────── */}
           <Card icon="👤" title="Personal Information">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" >
 
               <div>
                 <FL required>First Name</FL>
@@ -643,7 +643,7 @@ export default function EmployeeProfilePage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-12 rounded-xl bg-[#1C225B] hover:bg-[#141a47] active:scale-[0.99] text-white font-extrabold text-sm tracking-widest uppercase transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#1C225B]/20"
+            className="w-full h-12 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white font-extrabold text-sm tracking-widest uppercase transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
           >
             {submitting
               ? <><span className="animate-spin inline-block">⏳</span> Saving Profile...</>
