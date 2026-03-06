@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import AttendancceMyleave from "./AttendancceMyleave";
+import AttendanceleaveApproval from "./AttendanceleaveApproval";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -151,8 +153,8 @@ export default function AttendancePage() {
 
         <TabsList>
           <TabsTrigger value="attendance">Attendance</TabsTrigger>
-          <TabsTrigger value="apply-leave">Apply Leave</TabsTrigger>
           <TabsTrigger value="my-leaves">My Leaves</TabsTrigger>
+          <TabsTrigger value="leave-approvals">Leave Approval</TabsTrigger>
         </TabsList>
 
         <TabsContent value="attendance">
@@ -249,6 +251,12 @@ export default function AttendancePage() {
             </CardContent>
           </Card>
 
+        </TabsContent>
+        <TabsContent value="my-leaves">
+          <AttendancceMyleave employeeId={employeeid} />
+        </TabsContent>
+        <TabsContent value="leave-approvals">
+          <AttendanceleaveApproval employeeId={employeeid} />
         </TabsContent>
       </Tabs>
     </div>
