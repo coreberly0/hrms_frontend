@@ -101,7 +101,7 @@ export default function AttendancceMyleave() {
 
   return (
 
-    <div className="flex flex-col h-[calc(100vh-90px)] p-6 gap-4">
+    <div className="flex flex-col h-[calc(100vh-140px)] p-6 gap-4">
 
       {/* HEADER */}
 

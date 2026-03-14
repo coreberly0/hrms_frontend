@@ -1,13 +1,7 @@
-// ================= BASE CONFIG =================
-
 const API_URL = "https://hrms-backend-0r5r.onrender.com";
 
 const request = async (endpoint, options = {}) => {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
-
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   if (!token) throw new Error("Token missing");
 
   const res = await fetch(`${API_URL}${endpoint}`, {
@@ -27,16 +21,11 @@ const request = async (endpoint, options = {}) => {
   return res.json();
 };
 
-// ================= ATTENDANCE =================
-
 // ✅ Check In
-export const checkIn = () =>
-  request("/attendance/checkin", { method: "POST" });
+export const checkIn = () => request("/attendance/checkin", { method: "POST" });
 
 // ✅ Check Out
-export const checkOut = () =>
-  request("/attendance/checkout", { method: "PUT" });
+export const checkOut = () => request("/attendance/checkout", { method: "PUT" });
 
 // ✅ Get Logged-in Employee Attendance
-export const getMyAttendance = () =>
-  request("/attendance/my");
+export const getMyAttendance = () => request("/attendance/my");
