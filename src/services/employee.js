@@ -1,42 +1,37 @@
 const API_URL = "https://hrms-backend-0r5r.onrender.com";
 
 /* ---------------------------------------------
-   GENERIC REQUEST FUNCTION (MERGED VERSION)
+   GENERIC REQUEST FUNCTION (FIXED)
 --------------------------------------------- */
 const request = async (endpoint, method = "GET", body = null) => {
   try {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      console.warn("No authentication token found");
-      return null;
+      throw new Error("No authentication token found");
     }
 
-    const options = {
+    const res = await fetch(`${API_URL}${endpoint}`, {
       method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    };
+      body: body ? JSON.stringify(body) : null,
+    });
 
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
-
-    const res = await fetch(`${API_URL}${endpoint}`, options);
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
       throw new Error(
-        errorData.message || `API Error: ${res.status} ${res.statusText}`
+        data.message || `API Error: ${res.status} ${res.statusText}`
       );
     }
 
-    return res.json();
+    return data;
   } catch (error) {
-    console.log("API Request Error:", error.message);
-    return null;
+    console.error("API Request Error:", error.message);
+    throw error; // ✅ IMPORTANT (no return null)
   }
 };
 
@@ -46,18 +41,14 @@ const request = async (endpoint, method = "GET", body = null) => {
 const normalizeEmployee = (payload) => {
   let raw = payload;
 
-  if (Array.isArray(raw)) {
-    raw = raw[0];
-  }
+  if (Array.isArray(raw)) raw = raw[0];
 
   if (raw && typeof raw === "object") {
     if (raw.employee) raw = raw.employee;
     if (raw.data) raw = raw.data;
   }
 
-  if (!raw || typeof raw !== "object") {
-    return raw;
-  }
+  if (!raw || typeof raw !== "object") return raw;
 
   const normalized = { ...raw };
 
@@ -83,8 +74,7 @@ const normalizeEmployee = (payload) => {
    GET ALL EMPLOYEES
 --------------------------------------------- */
 export const getEmployees = async () => {
-  const data = await request("/employees");
-  return data;
+  return await request("/employees");
 };
 
 /* ---------------------------------------------

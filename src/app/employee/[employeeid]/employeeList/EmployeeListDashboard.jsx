@@ -23,13 +23,11 @@ import {
 
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
-/* ---------------- DASHBOARD ---------------- */
 export default function EmployeeListDashboard() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openAdd, setOpenAdd] = useState(false);
 
-  /* PAGINATION */
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -40,16 +38,13 @@ export default function EmployeeListDashboard() {
     currentPage * itemsPerPage
   );
 
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(1);
-  }, [employees, totalPages, currentPage]);
-
-  /* LOAD EMPLOYEES */
   const load = async () => {
     try {
       setLoading(true);
       const data = await getEmployees();
-      setEmployees(Array.isArray(data) ? data : (data?.employees || []));
+      setEmployees(Array.isArray(data) ? data : data?.employees || []);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -59,7 +54,10 @@ export default function EmployeeListDashboard() {
     load();
   }, []);
 
-  /* LOADING */
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [employees]);
+
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -70,6 +68,7 @@ export default function EmployeeListDashboard() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-85px)] p-6 gap-4">
+
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
@@ -114,7 +113,6 @@ export default function EmployeeListDashboard() {
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </div>
 
-                {/* EMPLOYEE */}
                 <div className="col-span-3 flex items-center gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
@@ -124,31 +122,20 @@ export default function EmployeeListDashboard() {
                   <div>
                     <div className="font-semibold">{emp.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      ID: {emp.employeeId || emp.id}
+                      ID: {emp.employee_id || emp.id}
                     </div>
                   </div>
                 </div>
 
-                {/* ROLE */}
                 <div className="col-span-2">{emp.position}</div>
-
-                {/* DEPARTMENT */}
                 <div className="col-span-2">{emp.department}</div>
 
-                {/* STATUS */}
                 <div className="col-span-2">
-                  <Badge
-                    className={
-                      emp.status === "Active"
-                        ? "bg-green-500"
-                        : "bg-gray-400"
-                    }
-                  >
+                  <Badge className="bg-green-500">
                     {emp.status || "Active"}
                   </Badge>
                 </div>
 
-                {/* ACTIONS */}
                 <div className="col-span-2 flex justify-end gap-2">
                   <Button size="icon" variant="outline">
                     <Pencil className="h-4 w-4" />
@@ -170,7 +157,6 @@ export default function EmployeeListDashboard() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  disabled={currentPage === 1}
                   onClick={() =>
                     setCurrentPage((p) => Math.max(p - 1, 1))
                   }
@@ -190,7 +176,6 @@ export default function EmployeeListDashboard() {
 
               <PaginationItem>
                 <PaginationNext
-                  disabled={currentPage === totalPages}
                   onClick={() =>
                     setCurrentPage((p) =>
                       Math.min(p + 1, totalPages)
@@ -203,16 +188,12 @@ export default function EmployeeListDashboard() {
         </div>
       )}
 
-      {/* ADD EMPLOYEE DIALOG */}
-      {openAdd && (
-        <AddEmployee
-          onClose={() => setOpenAdd(false)}
-          onSuccess={() => {
-            setOpenAdd(false);
-            load();
-          }}
-        />
-      )}
+      {/* ✅ IMPORTANT FIX */}
+      <AddEmployee
+        open={openAdd}
+        onClose={() => setOpenAdd(false)}
+        onSuccess={load}
+      />
     </div>
   );
 }

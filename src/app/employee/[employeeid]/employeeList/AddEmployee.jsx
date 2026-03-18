@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
-
 import { addEmployee } from "@/services/employee";
 
 import {
@@ -13,188 +10,234 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
+import { Separator } from "@/components/ui/separator";
 
-/* =========================
-   SCHEMA (FIXED)
-========================= */
-const employeeSchema = z.object({
-  name: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email address"),
-  position: z.string().min(1, "Role is required"),
-  department: z.string().optional(),
-  salary: z.coerce.number().positive("Salary must be greater than 0"),
-  password: z.string().min(6, "Minimum 6 characters"),
-  gender: z.enum(["male", "female", "other"]),
-});
+import { User, Mail, Briefcase, DollarSign, Lock } from "lucide-react";
 
-export default function AddEmployee({ onClose, onSuccess }) {
+export default function AddEmployee({ open, onClose, onSuccess }) {
   const [loading, setLoading] = React.useState(false);
 
   const {
     register,
     handleSubmit,
+    reset,
     setValue,
     watch,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(employeeSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      position: "",
-      department: "",
-      salary: 0,
-      password: "",
-      gender: "male",
-    },
+    defaultValues: { gender: "" },
   });
 
   const gender = watch("gender");
 
+  React.useEffect(() => {
+    if (!open) reset();
+  }, [open, reset]);
+
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-
-      await addEmployee(data); // no manual Number() needed
+      await addEmployee(data);
 
       toast.success("Employee added successfully");
       onSuccess?.();
       onClose?.();
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to add employee");
+      toast.error(err?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl rounded-xl">
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="w-[95%] sm:max-w-2xl rounded-2xl p-4 sm:p-6">
+
+        {/* HEADER */}
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="text-lg sm:text-2xl font-bold">
             Add New Employee
           </DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
+            Fill all required fields before submitting
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-          
-          {/* FORM GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Separator />
 
-            <FormField label="Full Name" error={errors.name?.message}>
-              <Input
-                placeholder="Enter full name"
-                {...register("name")}
-              />
-            </FormField>
+        {/* FORM */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            <FormField label="Email" error={errors.email?.message}>
-              <Input
-                type="email"
-                placeholder="employee@company.com"
-                {...register("email")}
-              />
-            </FormField>
-
-            <FormField label="Role" error={errors.position?.message}>
-              <Input
-                placeholder="Software Engineer"
-                {...register("position")}
-              />
-            </FormField>
-
-            <FormField label="Department">
-              <Input
-                placeholder="Engineering / HR / Finance"
-                {...register("department")}
-              />
-            </FormField>
-
-            <FormField label="Salary" error={errors.salary?.message}>
-              <Input
-                type="number"
-                placeholder="50000"
-                {...register("salary")}
-              />
-            </FormField>
-
-            <FormField label="Password" error={errors.password?.message}>
-              <Input
-                type="password"
-                placeholder="Minimum 6 characters"
-                {...register("password")}
-              />
-            </FormField>
-          </div>
-
-          {/* GENDER TABS */}
+          {/* BASIC INFO */}
           <div>
-            <Label className="mb-2 block">Gender</Label>
-            <div className="flex gap-3">
-              {["male", "female", "other"].map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setValue("gender", g)}
-                  className={`px-4 py-2 rounded-md border text-sm capitalize transition
-                    ${
-                      gender === g
-                        ? "bg-primary text-white border-primary"
-                        : "hover:bg-muted"
-                    }`}
-                >
-                  {g}
-                </button>
-              ))}
+            <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-3">
+              Basic Information
+            </h3>
+
+            {/* ✅ RESPONSIVE GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              {/* NAME */}
+              <div>
+                <Label>Name</Label>
+                <div className="relative mt-1">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    className="pl-9"
+                    placeholder="Enter name"
+                    {...register("name", { required: "Name is required" })}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              {/* EMAIL */}
+              <div>
+                <Label>Email</Label>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    className="pl-9"
+                    placeholder="Enter email"
+                    {...register("email", { required: "Email is required" })}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
             </div>
           </div>
 
-          {/* ACTION BUTTONS */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={loading}
-            >
+          {/* JOB INFO */}
+          <div>
+            <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-3">
+              Job Details
+            </h3>
+
+            {/* ✅ RESPONSIVE GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              {/* POSITION */}
+              <div>
+                <Label>Position</Label>
+                <div className="relative mt-1">
+                  <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    className="pl-9"
+                    placeholder="Developer / Manager"
+                    {...register("position", { required: "Position is required" })}
+                  />
+                </div>
+              </div>
+
+              {/* DEPARTMENT */}
+              <div>
+                <Label>Department</Label>
+                <Input
+                  className="mt-1"
+                  placeholder="HR / IT / Finance"
+                  {...register("department")}
+                />
+              </div>
+
+              {/* SALARY */}
+              <div>
+                <Label>Salary</Label>
+                <div className="relative mt-1">
+                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    className="pl-9"
+                    placeholder="Enter salary"
+                    {...register("salary", {
+                      required: "Salary is required",
+                    })}
+                  />
+                </div>
+              </div>
+
+              {/* GENDER */}
+              <div>
+                <Label>Gender</Label>
+
+                <input
+                  type="hidden"
+                  {...register("gender", {
+                    required: "Gender is required",
+                  })}
+                />
+
+                {/* ✅ MOBILE STACK */}
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {["male", "female", "other"].map((g) => (
+                    <Button
+                      key={g}
+                      type="button"
+                      variant={gender === g ? "default" : "outline"}
+                      className="text-xs sm:text-sm"
+                      onClick={() =>
+                        setValue("gender", g, { shouldValidate: true })
+                      }
+                    >
+                      {g === "male" && "👨"}
+                      {g === "female" && "👩"}
+                      {g === "other" && "⚧"}
+                    </Button>
+                  ))}
+                </div>
+
+                {errors.gender && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.gender.message}
+                  </p>
+                )}
+              </div>
+
+            </div>
+          </div>
+
+          {/* PASSWORD */}
+          <div>
+            <Label>Password</Label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="password"
+                className="pl-9"
+                placeholder="Enter password"
+                {...register("password", { required: true })}
+              />
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
 
             <Button type="submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" />
-                  Saving...
-                </>
-              ) : (
-                "Save Employee"
-              )}
+              {loading ? "Saving..." : "Create Employee"}
             </Button>
           </div>
+
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-/* =========================
-   FORM FIELD
-========================= */
-function FormField({ label, error, children }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-sm font-medium">{label}</Label>
-      {children}
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
-    </div>
   );
 }
