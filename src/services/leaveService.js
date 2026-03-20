@@ -13,8 +13,12 @@ const request = async (endpoint, options = {}) => {
       throw new Error("Token missing. Please login again.");
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     const res = await fetch(`${API_URL}${endpoint}`, {
       ...options,
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -22,12 +26,21 @@ const request = async (endpoint, options = {}) => {
       }
     });
 
+    clearTimeout(timeout);
+
     let data = {};
 
     try {
       data = await res.json();
-    } catch (err) {
+    } catch {
       data = {};
+    }
+
+    // 🔴 Auto logout if token expired
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+      throw new Error("Session expired. Please login again.");
     }
 
     if (!res.ok) {
@@ -43,93 +56,62 @@ const request = async (endpoint, options = {}) => {
 };
 
 
-
 /* ===================================================== */
 /* ==================== LEAVE TYPES ==================== */
 /* ===================================================== */
 
-// GET /leave/types
-export const getLeaveTypes = async () => {
-  return request("/leave/types");
-};
-
+export const getLeaveTypes = () => request("/leave/types");
 
 
 /* ===================================================== */
 /* =================== LEAVE BALANCE =================== */
 /* ===================================================== */
 
-// GET /leave/balance
-export const getLeaveBalance = async () => {
-  return request("/leave/balance");
-};
+export const getLeaveBalance = () => request("/leave/balance");
 
-
-// POST /leave/add-balance
-export const addLeaveBalance = async (data) => {
-  return request("/leave/add-balance", {
+export const addLeaveBalance = (data) =>
+  request("/leave/add-balance", {
     method: "POST",
     body: JSON.stringify(data)
   });
-};
 
-
-// PUT /leave/update-balance
-export const updateLeaveBalance = async (data) => {
-  return request("/leave/update-balance", {
+export const updateLeaveBalance = (data) =>
+  request("/leave/update-balance", {
     method: "PUT",
     body: JSON.stringify(data)
   });
-};
-
 
 
 /* ===================================================== */
 /* ===================== APPLY LEAVE =================== */
 /* ===================================================== */
 
-// POST /leave/apply
-export const applyLeave = async (data) => {
-  return request("/leave/apply", {
+export const applyLeave = (data) =>
+  request("/leave/apply", {
     method: "POST",
     body: JSON.stringify(data)
   });
-};
-
 
 
 /* ===================================================== */
 /* ================= EMPLOYEE LEAVE LIST =============== */
 /* ===================================================== */
 
-// GET /leave/my-leaves
-export const getMyLeaves = async () => {
-  return request("/leave/my-leaves");
-};
-
+export const getMyLeaves = () => request("/leave/my-leaves");
 
 
 /* ===================================================== */
 /* ================= MANAGER / HR ====================== */
 /* ===================================================== */
 
-// GET /leave/all
-export const getAllLeaves = async () => {
-  return request("/leave/all");
-};
+export const getAllLeaves = () => request("/leave/all");
 
-
-// PUT /leave/approve/:id
-export const approveLeave = async (leaveId) => {
-  return request(`/leave/approve/${leaveId}`, {
+export const approveLeave = (leaveId) =>
+  request(`/leave/approve/${leaveId}`, {
     method: "PUT"
   });
-};
 
-
-// PUT /leave/reject/:id
-export const rejectLeave = async (leaveId) => {
-  return request(`/leave/reject/${leaveId}`, {
+export const rejectLeave = (leaveId) =>
+  request(`/leave/reject/${leaveId}`, {
     method: "PUT"
   });
-};
