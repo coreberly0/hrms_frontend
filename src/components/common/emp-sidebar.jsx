@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   CalendarCheck,
-  FileText,
   FolderKanban,
   LogOut,
   User,
-  Users
+  Users,
 } from "lucide-react";
 
 import {
@@ -27,48 +27,71 @@ export function EmpSidebar() {
   const pathname = usePathname();
   const empId = pathname.split("/")[2];
 
-  if (!empId) return null;
+  const [role, setRole] = useState(null);
+
+  // ✅ Load role ONLY on client (prevents hydration error)
+  useEffect(() => {
+    try {
+      const data = JSON.parse(localStorage.getItem("employeeData") || "{}");
+      setRole(data?.role || "employee");
+    } catch {
+      setRole("employee");
+    }
+  }, []);
+
+  // ✅ Prevent render until role is ready (avoids mismatch)
+  if (!empId || role === null) return null;
 
   const handleLogout = () => {
-    localStorage.removeItem("employeeData");
-    localStorage.removeItem("token");
+    localStorage.clear();
     router.push("/login");
   };
 
   return (
-    <Sidebar className="bg-slate-900 text-white">
-      <SidebarHeader className="bg-slate-900 text-xl font-bold px-4 py-3 border-b border-[#1C225B]">
-        Employee Panel
+    <Sidebar className="!bg-[#0b1220] text-white border-r border-slate-800 shadow-xl">
+
+      {/* HEADER */}
+      <SidebarHeader className="!bg-[#0b1220] px-4 py-4 border-b border-slate-800">
+        <div className="flex flex-col">
+          <span className="text-xl font-bold tracking-wide">
+            <span className="text-blue-500">HRMS</span> Panel
+          </span>
+
+          {/* ROLE BADGE */}
+          <span className="text-xs mt-2 px-2 py-1 w-fit bg-blue-500/20 text-blue-300 rounded-md capitalize">
+            {role}
+          </span>
+        </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-slate-900 px-2 py-4">
-        <SidebarMenu className="space-y-1">
+      {/* CONTENT */}
+      <SidebarContent className="!bg-[#0b1220] px-2 py-4">
+        <SidebarMenu className="space-y-2">
 
-          {/* Dashboard */}
+          {/* DASHBOARD */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname === `/employee/${empId}`}
+              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600 data-[active=true]:shadow-md"
             >
-              <Link
-                href={`/employee/${empId}`}
-                className="flex gap-3 px-4 py-2"
-              >
+              <Link href={`/employee/${empId}`} className="flex items-center gap-3 px-4 py-2">
                 <LayoutDashboard className="h-5 w-5" />
                 Dashboard
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* Attendance */}
+          {/* ATTENDANCE */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/attendance`)}
+              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
             >
               <Link
                 href={`/employee/${empId}/attendance`}
-                className="flex gap-3 px-4 py-2"
+                className="flex items-center gap-3 px-4 py-2"
               >
                 <CalendarCheck className="h-5 w-5" />
                 Attendance
@@ -76,47 +99,54 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* EmployeeList */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith(`/employee/${empId}/employeeList`)}
-            >
-              <Link
-                href={`/employee/${empId}/employeeList`}
-                className="flex gap-3 px-4 py-2"
+          {/* EMPLOYEE LIST (ADMIN + HR) */}
+          {(role === "admin" || role === "hr") && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.includes("employeeList")}
+                className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
               >
-                <Users className="h-5 w-5" />
-                Employee List
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+                <Link
+                  href={`/employee/${empId}/employeeList`}
+                  className="flex items-center gap-3 px-4 py-2"
+                >
+                  <Users className="h-5 w-5" />
+                  Employee List
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
-          {/* Payslip
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith(`/employee/${empId}/payslip`)}
-            >
-              <Link
-                href={`/employee/${empId}/payslip`}
-                className="flex gap-3 px-4 py-2"
+          {/* TEAM (MANAGER) */}
+          {role === "manager" && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.includes("team-member")}
+                className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
               >
-                <FileText className="h-5 w-5" />
-                Payslip
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem> */}
+                <Link
+                  href={`/employee/${empId}/team-member`}
+                  className="flex items-center gap-3 px-4 py-2"
+                >
+                  <Users className="h-5 w-5" />
+                  Team Members
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
-          {/* Projects */}
+          {/* PROJECTS */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/projects`)}
+              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
             >
               <Link
                 href={`/employee/${empId}/projects`}
-                className="flex gap-3 px-4 py-2"
+                className="flex items-center gap-3 px-4 py-2"
               >
                 <FolderKanban className="h-5 w-5" />
                 Projects
@@ -124,15 +154,16 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* Profile */}
+          {/* PROFILE */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={pathname.startsWith(`/employee/${empId}/ProfileDashboard`)}
+              isActive={pathname.includes("ProfileDashboard")}
+              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
             >
               <Link
                 href={`/employee/${empId}/ProfileDashboard`}
-                className="flex gap-3 px-4 py-2"
+                className="flex items-center gap-3 px-4 py-2"
               >
                 <User className="h-5 w-5" />
                 Profile
@@ -143,12 +174,13 @@ export function EmpSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="bg-slate-900 border-t border-[#1C225B]">
+      {/* FOOTER */}
+      <SidebarFooter className="!bg-[#0b1220] border-t border-slate-800 p-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleLogout}
-              className="text-red-200 hover:text-red-100"
+              className="rounded-lg transition-all duration-200 hover:bg-red-500/20 text-red-400 hover:text-red-300"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -156,6 +188,7 @@ export function EmpSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
     </Sidebar>
   );
 }
