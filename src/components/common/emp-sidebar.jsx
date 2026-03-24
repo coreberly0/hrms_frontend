@@ -49,6 +49,20 @@ export function EmpSidebar() {
     router.push("/login");
   };
 
+  // ✅ ROLE COLORS
+  const getRoleStyle = (role) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "hr":
+        return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+      case "manager":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-300 border-gray-500/30";
+    }
+  };
+
   return (
     <Sidebar
       collapsible="icon"
@@ -60,18 +74,23 @@ export function EmpSidebar() {
 
         <div className="flex items-center gap-3">
 
-          {/* ICON (VISIBLE ALWAYS) */}
           <LayoutDashboard className="h-6 w-6 text-blue-500" />
 
-          {/* TEXT (HIDE ON COLLAPSE) */}
+          {/* TEXT */}
           <div className="group-data-[collapsible=icon]:hidden">
             <div className="text-xl font-bold">
               <span className="text-blue-500">HRMS</span> Panel
             </div>
 
-            <div className="text-xs mt-1 px-2 py-1 w-fit bg-blue-500/20 text-blue-300 rounded-md capitalize">
+            {/* ✅ ROLE CHIP */}
+            <div
+              className={`text-xs mt-1 px-3 py-1 w-fit rounded-full border capitalize font-medium ${getRoleStyle(
+                role
+              )}`}
+            >
               {role}
             </div>
+
           </div>
 
         </div>
@@ -82,16 +101,14 @@ export function EmpSidebar() {
       <SidebarContent className="!bg-[#0b1220] px-2 py-4">
         <SidebarMenu className="space-y-2">
 
-          {/* DASHBOARD */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname === `/employee/${empId}`}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
             >
               <Link href={`/employee/${empId}`}>
                 <LayoutDashboard className="h-6 w-6" />
-
                 <span className="group-data-[collapsible=icon]:hidden">
                   Dashboard
                 </span>
@@ -99,12 +116,11 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* ATTENDANCE */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/attendance`)}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
             >
               <Link href={`/employee/${empId}/attendance`}>
                 <CalendarCheck className="h-6 w-6" />
@@ -115,13 +131,12 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* EMPLOYEE LIST */}
           {(role === "admin" || role === "hr") && (
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
                 isActive={pathname.includes("employeeList")}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
               >
                 <Link href={`/employee/${empId}/employeeList`}>
                   <Users className="h-6 w-6" />
@@ -133,13 +148,12 @@ export function EmpSidebar() {
             </SidebarMenuItem>
           )}
 
-          {/* TEAM */}
           {role === "manager" && (
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
                 isActive={pathname.includes("team-member")}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
               >
                 <Link href={`/employee/${empId}/team-member`}>
                   <Users className="h-6 w-6" />
@@ -151,12 +165,11 @@ export function EmpSidebar() {
             </SidebarMenuItem>
           )}
 
-          {/* PROJECTS */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/projects`)}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
             >
               <Link href={`/employee/${empId}/projects`}>
                 <FolderKanban className="h-6 w-6" />
@@ -167,12 +180,11 @@ export function EmpSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* PROFILE */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.includes("ProfileDashboard")}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
             >
               <Link href={`/employee/${empId}/ProfileDashboard`}>
                 <User className="h-6 w-6" />
