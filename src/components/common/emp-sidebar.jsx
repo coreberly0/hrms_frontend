@@ -12,6 +12,8 @@ import {
   Users,
 } from "lucide-react";
 
+import { useSidebar } from "@/components/ui/sidebar";
+
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +30,8 @@ export function EmpSidebar() {
   const empId = pathname.split("/")[2];
 
   const [role, setRole] = useState(null);
+
+  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     try {
@@ -46,145 +50,159 @@ export function EmpSidebar() {
   };
 
   return (
-    <Sidebar className="relative text-white border-r border-white/10 shadow-2xl overflow-hidden">
+    <Sidebar
+      collapsible="icon"
+      className="!bg-[#0b1220] text-white border-r border-slate-800 shadow-xl"
+    >
 
-      {/* BACKGROUND */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#0f172a] to-[#020617]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.25),transparent_60%)]" />
+      {/* HEADER */}
+      <SidebarHeader className="!bg-[#0b1220] px-4 py-4 border-b border-slate-800">
 
-      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex items-center gap-3">
 
-        {/* HEADER */}
-        <SidebarHeader className="px-5 py-6 border-b border-white/10">
-          <div className="flex flex-col gap-3">
-            <span className="text-2xl font-extrabold tracking-wide">
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
-                HRMS
-              </span>{" "}
-              Panel
-            </span>
+          {/* ICON (VISIBLE ALWAYS) */}
+          <LayoutDashboard className="h-6 w-6 text-blue-500" />
 
-            {/* 🔥 ROLE BADGE (IMPROVED) */}
-            <span
-              className={`
-                relative text-xs px-3 py-1 w-fit rounded-full capitalize font-semibold tracking-wide
-                border backdrop-blur-md shadow-lg transition-all duration-300
+          {/* TEXT (HIDE ON COLLAPSE) */}
+          <div className="group-data-[collapsible=icon]:hidden">
+            <div className="text-xl font-bold">
+              <span className="text-blue-500">HRMS</span> Panel
+            </div>
 
-                ${role === "admin" && "bg-red-500/20 text-red-300 border-red-400/30 shadow-red-500/30"}
-                ${role === "hr" && "bg-purple-500/20 text-purple-300 border-purple-400/30 shadow-purple-500/30"}
-                ${role === "manager" && "bg-blue-500/20 text-blue-300 border-blue-400/30 shadow-blue-500/30"}
-                ${role === "employee" && "bg-emerald-500/20 text-emerald-300 border-emerald-400/30 shadow-emerald-500/30"}
-              `}
-            >
-              {/* glowing dot */}
-              <span
-                className={`
-                  absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full animate-pulse
-
-                  ${role === "admin" && "bg-red-400"}
-                  ${role === "hr" && "bg-purple-400"}
-                  ${role === "manager" && "bg-blue-400"}
-                  ${role === "employee" && "bg-emerald-400"}
-                `}
-              />
-
+            <div className="text-xs mt-1 px-2 py-1 w-fit bg-blue-500/20 text-blue-300 rounded-md capitalize">
               {role}
-            </span>
+            </div>
           </div>
-        </SidebarHeader>
 
-        {/* CONTENT */}
-        <SidebarContent className="px-3 py-6">
-          <SidebarMenu className="space-y-3">
+        </div>
 
-            {[
-              {
-                label: "Dashboard",
-                icon: LayoutDashboard,
-                href: `/employee/${empId}`,
-                active: pathname === `/employee/${empId}`,
-              },
-              {
-                label: "Attendance",
-                icon: CalendarCheck,
-                href: `/employee/${empId}/attendance`,
-                active: pathname.startsWith(`/employee/${empId}/attendance`),
-              },
-              ...(role === "admin" || role === "hr"
-                ? [{
-                    label: "Employee List",
-                    icon: Users,
-                    href: `/employee/${empId}/employeeList`,
-                    active: pathname.includes("employeeList"),
-                  }]
-                : []),
-              ...(role === "manager"
-                ? [{
-                    label: "Team Members",
-                    icon: Users,
-                    href: `/employee/${empId}/team-member`,
-                    active: pathname.includes("team-member"),
-                  }]
-                : []),
-              {
-                label: "Projects",
-                icon: FolderKanban,
-                href: `/employee/${empId}/projects`,
-                active: pathname.startsWith(`/employee/${empId}/projects`),
-              },
-              {
-                label: "Profile",
-                icon: User,
-                href: `/employee/${empId}/ProfileDashboard`,
-                active: pathname.includes("ProfileDashboard"),
-              },
-            ].map((item, i) => (
-              <SidebarMenuItem key={i}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={item.active}
-                  className={`
-                    relative rounded-xl px-4 py-2 transition-all duration-300
-                    bg-white/5 backdrop-blur-md
-                    hover:bg-white/10 hover:scale-[1.02]
+      </SidebarHeader>
 
-                    data-[active=true]:bg-gradient-to-r 
-                    data-[active=true]:from-blue-500 
-                    data-[active=true]:to-purple-500
-                    data-[active=true]:shadow-[0_0_20px_rgba(59,130,246,0.6)]
-                  `}
-                >
-                  <Link href={item.href} className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-sm font-semibold tracking-wide">
-                      {item.label}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+      {/* CONTENT */}
+      <SidebarContent className="!bg-[#0b1220] px-2 py-4">
+        <SidebarMenu className="space-y-2">
 
-          </SidebarMenu>
-        </SidebarContent>
+          {/* DASHBOARD */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === `/employee/${empId}`}
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+            >
+              <Link href={`/employee/${empId}`}>
+                <LayoutDashboard className="h-6 w-6" />
 
-        {/* FOOTER */}
-        <SidebarFooter className="border-t border-white/10 p-3">
-          <SidebarMenu>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Dashboard
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* ATTENDANCE */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/attendance`)}
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+            >
+              <Link href={`/employee/${empId}/attendance`}>
+                <CalendarCheck className="h-6 w-6" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Attendance
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* EMPLOYEE LIST */}
+          {(role === "admin" || role === "hr") && (
             <SidebarMenuItem>
               <SidebarMenuButton
-                onClick={handleLogout}
-                className="flex items-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 
-                bg-white/5 hover:bg-red-500/20 hover:scale-[1.02]
-                text-red-400 hover:text-red-300"
+                asChild
+                isActive={pathname.includes("employeeList")}
+                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
               >
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm font-semibold">Logout</span>
+                <Link href={`/employee/${empId}/employeeList`}>
+                  <Users className="h-6 w-6" />
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Employee List
+                  </span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
+          )}
 
-      </div>
+          {/* TEAM */}
+          {role === "manager" && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.includes("team-member")}
+                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              >
+                <Link href={`/employee/${empId}/team-member`}>
+                  <Users className="h-6 w-6" />
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Team Members
+                  </span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+
+          {/* PROJECTS */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/projects`)}
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+            >
+              <Link href={`/employee/${empId}/projects`}>
+                <FolderKanban className="h-6 w-6" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Projects
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* PROFILE */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.includes("ProfileDashboard")}
+              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+            >
+              <Link href={`/employee/${empId}/ProfileDashboard`}>
+                <User className="h-6 w-6" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Profile
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+        </SidebarMenu>
+      </SidebarContent>
+
+      {/* FOOTER */}
+      <SidebarFooter className="!bg-[#0b1220] border-t border-slate-800 p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-500/20 text-red-400 hover:text-red-300 group-data-[collapsible=icon]:justify-center"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                Logout
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
     </Sidebar>
   );
 }
