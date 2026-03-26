@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Users,
   CalendarCheck,
+  MessageSquare,
 } from "lucide-react";
 
 import {
@@ -70,6 +71,19 @@ export function HRSidebar() {
               <Link href={`/hr/${hrId}/attendance`} className="flex gap-3 px-4 py-2">
                 <CalendarCheck className="h-5 w-5" />
                 Attendance
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Chat */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/hr/${hrId}/chat`)}
+            >
+              <Link href={`/hr/${hrId}/chat`} className="flex gap-3 px-4 py-2">
+                <MessageSquare className="h-5 w-5" />
+                Messages
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

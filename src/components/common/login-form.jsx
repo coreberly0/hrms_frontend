@@ -55,25 +55,25 @@ export default function LoginForm() {
 
   return (
     <div className="w-full">
-      <Card className="border-0 shadow-2xl rounded-2xl overflow-hidden">
+      <Card className="border-0 shadow-lg sm:shadow-2xl rounded-xl sm:rounded-2xl overflow-hidden">
         <CardContent className="p-0">
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 px-8 py-6 text-white">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 px-6 sm:px-8 py-4 sm:py-6 text-white">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold">HRMS Portal</h1>
-                <p className="text-slate-300 text-xs">Sign in to your account</p>
+                <h1 className="text-lg sm:text-xl font-bold">HRMS Portal</h1>
+                <p className="text-slate-300 text-xs sm:text-sm">Sign in to your account</p>
               </div>
             </div>
           </div>
 
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 p-6"
+            className="space-y-4 p-4 sm:p-6"
           >
             <FieldGroup className="space-y-4">
               <Controller
@@ -81,7 +81,7 @@ export default function LoginForm() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <FieldLabel className="text-xs sm:text-sm font-semibold text-gray-700 flex items-center gap-2">
                       <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -92,7 +92,7 @@ export default function LoginForm() {
                       type="email"
                       placeholder="your.email@company.com"
                       disabled={loading}
-                      className="mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                      className="mt-1 px-3 sm:px-4 py-2 text-sm rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all w-full"
                     />
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
@@ -106,7 +106,7 @@ export default function LoginForm() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <FieldLabel className="text-xs sm:text-sm font-semibold text-gray-700 flex items-center gap-2">
                       <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
@@ -117,7 +117,7 @@ export default function LoginForm() {
                       type="password"
                       placeholder="••••••••"
                       disabled={loading}
-                      className="mt-1 px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                      className="mt-1 px-3 sm:px-4 py-2 text-sm rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all w-full"
                     />
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
@@ -126,10 +126,10 @@ export default function LoginForm() {
                 )}
               />
 
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 pt-1">
                 <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
                   <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600" />
-                  Remember me
+                  <span>Remember me</span>
                 </label>
                 <a href="#" className="text-xs text-blue-600 hover:text-blue-700 font-medium">
                   Forgot password?
@@ -138,7 +138,7 @@ export default function LoginForm() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 rounded-lg transition-all shadow-lg hover:shadow-xl mt-4"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 px-3 text-sm sm:text-base rounded-lg transition-all shadow-lg hover:shadow-xl mt-4"
                 disabled={loading}
               >
                 {loading ? (
@@ -162,11 +162,11 @@ export default function LoginForm() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white text-gray-500">Secure login</span>
+                <span className="px-2 bg-white text-gray-500 text-xs">Secure login</span>
               </div>
             </div>
 
-            <p className="text-center text-xs text-gray-600">
+            <p className="text-center text-xs sm:text-sm text-gray-600">
               By signing in, you agree to our{' '}
               <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
                 Terms of Service
@@ -181,20 +181,20 @@ export default function LoginForm() {
       </Card>
 
       {/* Security badges */}
-      <div className="mt-4 flex justify-center gap-4 px-4">
-        <div className="flex items-center gap-1 text-xs text-gray-600">
+      <div className="mt-4 flex flex-wrap justify-center gap-2 sm:gap-4 px-4">
+        <div className="flex items-center gap-1 text-xs text-gray-600 px-2 py-1 bg-gray-100 rounded-full">
           <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 111.414 1.414L7.414 9l3.293 3.293a1 1 0 01-1.414 1.414l-4-4z" clipRule="evenodd" />
           </svg>
           SSL
         </div>
-        <div className="flex items-center gap-1 text-xs text-gray-600">
+        <div className="flex items-center gap-1 text-xs text-gray-600 px-2 py-1 bg-gray-100 rounded-full">
           <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 111.414 1.414L7.414 9l3.293 3.293a1 1 0 01-1.414 1.414l-4-4z" clipRule="evenodd" />
           </svg>
           2FA
         </div>
-        <div className="flex items-center gap-1 text-xs text-gray-600">
+        <div className="flex items-center gap-1 text-xs text-gray-600 px-2 py-1 bg-gray-100 rounded-full">
           <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 111.414 1.414L7.414 9l3.293 3.293a1 1 0 01-1.414 1.414l-4-4z" clipRule="evenodd" />
           </svg>

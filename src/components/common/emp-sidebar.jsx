@@ -10,6 +10,7 @@ import {
   LogOut,
   User,
   Users,
+  MessageSquare,
 } from "lucide-react";
 
 import { useSidebar } from "@/components/ui/sidebar";
@@ -179,6 +180,26 @@ export function EmpSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+
+          {/* CHAT */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/chat`)}
+              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
+            >
+              <Link
+                href={`/employee/${empId}/chat`}
+                className="flex items-center gap-3 px-4 py-2"
+              >
+                <MessageSquare className="h-5 w-5" />
+                Messages
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* PROFILE */}
 
           <SidebarMenuItem>
             <SidebarMenuButton
