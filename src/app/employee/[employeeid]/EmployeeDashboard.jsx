@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getEmployeeById } from "@/services/employee";
 
 import HRAnalytics from "@/components/dashboard/HRAnalytics";
@@ -23,6 +23,7 @@ export default function EmployeeDashboard({ employeeid }) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [employee, setEmployee] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +44,14 @@ export default function EmployeeDashboard({ employeeid }) {
     if (mounted) fetchEmployee();
   }, [employeeid, mounted]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center min-h-[70vh]">
@@ -52,6 +61,22 @@ export default function EmployeeDashboard({ employeeid }) {
   }
 
   const role = employee?.role?.toLowerCase()?.trim();
+  const employeeName = employee?.employeeName || employee?.name || "";
+  const dayLabel = currentDateTime.toLocaleDateString("en-US", {
+    weekday: "long",
+  });
+  const dateLabel = currentDateTime.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timeLabel = currentDateTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  const dateTimeLabel = `${dayLabel}, ${dateLabel} ${timeLabel}`;
 
   const chartData = [
     { name: "Completed", value: 10 },
@@ -71,46 +96,66 @@ export default function EmployeeDashboard({ employeeid }) {
 
       {/* Top Section */}
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="space-y-3">
 
-        {/* Welcome Card */}
+        {/* Welcome Header */}
 
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-500 to-blue-600 text-white">
+        <div className="flex w-full flex-col gap-2 px-1 py-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+              Welcome back👋, {employeeName}
+            </h2>
+            <p className="mt-1 text-slate-600">Here&apos;s what&apos;s happening today.</p>
+          </div>
 
-          <CardContent className="p-6">
+          <div className="shrink-0 text-left sm:text-right">
+            <p className="text-sm font-semibold text-slate-700">{dayLabel}</p>
+            <p className="text-sm text-slate-600">{dateLabel}</p>
+            <p className="text-lg font-bold text-slate-900 tabular-nums">{timeLabel}</p>
+          </div>
+        </div>
 
-            <div className="flex justify-between items-start">
+        {/* Attendance & Announcement */}
 
-              <div>
-                <h2 className="text-3xl font-bold">Welcome Back 👋</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Attendance Card */}
+          <div className="min-w-0 lg:h-[320px]">
+            <AttendanceCheck />
+          </div>
 
-                <p className="text-2xl font-semibold mt-2">
-                  {employee?.employeeName || employee?.name || ""}
-                </p>
+          {/* Announcement Card */}
+          <Card className="shadow-md flex flex-col lg:h-[320px]">
+            <CardContent className="p-4 flex h-full min-h-0 flex-col">
+              <h3 className="text-lg font-semibold mb-4">Announcements</h3>
+              <ScrollArea className="min-h-0 flex-1 pr-4">
+                <div className="space-y-3 pb-2">
+                  <div className="border-l-4 border-blue-500 pl-3 py-2">
+                    <div className="flex items-start justify-between">
+                      <p className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">Info</p>
+                    </div>
+                    <p className="text-sm mt-1">Server maintenance scheduled for Sunday.</p>
+                    <p className="text-xs text-slate-500 mt-1">2 hours ago</p>
+                  </div>
 
-                <p className="text-sm mt-3 opacity-90">
-                  Let's make today productive 🚀
-                </p>
-              </div>
+                  <div className="border-l-4 border-green-500 pl-3 py-2">
+                    <div className="flex items-start justify-between">
+                      <p className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded">New</p>
+                    </div>
+                    <p className="text-sm mt-1">Policy update: Annual Leave carry-over enabled.</p>
+                    <p className="text-xs text-slate-500 mt-1">5 hours ago</p>
+                  </div>
 
-              <div className="bg-white/20 p-3 rounded-lg">
-                <Sparkles className="h-6 w-6" />
-              </div>
-
-            </div>
-
-            <div className="mt-6 bg-white/20 rounded-lg p-3 text-sm">
-              “Consistency is what transforms average into excellence.”
-            </div>
-
-          </CardContent>
-
-        </Card>
-
-        {/* Attendance */}
-
-        <div className="min-w-0">
-          <AttendanceCheck />
+                  <div className="border-l-4 border-orange-500 pl-3 py-2">
+                    <div className="flex items-start justify-between">
+                      <p className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded">Alert</p>
+                    </div>
+                    <p className="text-sm mt-1">Team standup meeting at 3:00 PM today.</p>
+                    <p className="text-xs text-slate-500 mt-1">1 hour ago</p>
+                  </div>
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
         </div>
 
       </div>

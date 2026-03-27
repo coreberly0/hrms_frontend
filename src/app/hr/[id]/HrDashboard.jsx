@@ -8,7 +8,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +23,7 @@ export default function HrDashboard({ id }) {
   const [hr, setHr] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
     async function fetchHr() {
@@ -41,6 +41,14 @@ export default function HrDashboard({ id }) {
 
     if (id) fetchHr();
   }, [id]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   /* ---------------- LOADING ---------------- */
   if (loading) {
@@ -70,30 +78,41 @@ export default function HrDashboard({ id }) {
 
   if (!hr) return null;
 
+  const dayLabel = currentDateTime.toLocaleDateString("en-US", {
+    weekday: "long",
+  });
+  const dateLabel = currentDateTime.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timeLabel = currentDateTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
 
-      {/* 🔥 HERO HEADER */}
-      <Card className="rounded-2xl bg-gradient-to-r from-slate-900 to-slate-700 text-white shadow-xl">
-        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-6">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold">
-              {hr.name.charAt(0)}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{hr.name}</h1>
-              <p className="text-white/80">{hr.role}</p>
-            </div>
+      {/* HERO HEADER */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+              Welcome back, {hr.name}
+            </h1>
+            <p className="mt-1 text-slate-600">Here&apos;s what&apos;s happening today.</p>
           </div>
 
-          <Badge
-            className="px-4 py-1 text-sm"
-            variant={hr.status === "Active" ? "success" : "destructive"}
-          >
-            {hr.status}
-          </Badge>
-        </CardContent>
-      </Card>
+          <div className="shrink-0 text-left sm:text-right">
+            <p className="text-sm font-semibold text-slate-700">{dayLabel}</p>
+            <p className="text-sm text-slate-600">{dateLabel}</p>
+            <p className="text-lg font-bold tabular-nums text-slate-900">{timeLabel}</p>
+          </div>
+        </div>
+      </div>
 
       {/* 📊 STATS */}
       <div className="grid sm:grid-cols-3 gap-4">

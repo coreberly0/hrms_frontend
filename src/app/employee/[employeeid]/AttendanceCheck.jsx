@@ -107,15 +107,15 @@ export default function AttendanceCheck() {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Attendance</CardTitle>
+    <div className="h-full">
+      <Card className="h-full">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-2xl">Attendance</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-between items-center mb-4">
+        <CardContent className="pt-0 pb-4">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <p>Current Time</p>
+              <p className="text-sm">Current Time</p>
               <h2 className="text-2xl font-bold">{formatTimeIST(currentTime)}</h2>
             </div>
             <Badge className={attendanceCompleted ? "bg-blue-600" : isClockedIn ? "bg-green-600" : "bg-gray-400"}>
@@ -123,18 +123,18 @@ export default function AttendanceCheck() {
             </Badge>
           </div>
 
-          <div className="grid grid-cols-3 text-center mb-4">
+          <div className="grid grid-cols-3 text-center mb-3">
             <div>
-              <p>IN</p>
-              <p>{clockInTime ? formatTimeIST(clockInTime) : "--:--"}</p>
+              <p className="text-sm">IN</p>
+              <p className="text-sm">{clockInTime ? formatTimeIST(clockInTime) : "--:--"}</p>
             </div>
             <div>
-              <p>OUT</p>
-              <p>{clockOutTime ? formatTimeIST(clockOutTime) : "--:--"}</p>
+              <p className="text-sm">OUT</p>
+              <p className="text-sm">{clockOutTime ? formatTimeIST(clockOutTime) : "--:--"}</p>
             </div>
             <div>
-              <p>HOURS</p>
-              <p>{duration ? `${duration.hours}h ${duration.minutes}m` : "--"}</p>
+              <p className="text-sm">HOURS</p>
+              <p className="text-sm">{duration ? `${duration.hours}h ${duration.minutes}m` : "--"}</p>
             </div>
           </div>
 
