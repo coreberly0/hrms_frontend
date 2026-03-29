@@ -110,7 +110,7 @@ export default function AttendanceCheck() {
     <div className="h-full">
       <Card className="h-full">
         <CardHeader className="pb-2">
-          <CardTitle className="text-2xl">Attendance</CardTitle>
+          <CardTitle className="text-lg font-semibold">Attendance</CardTitle>
         </CardHeader>
         <CardContent className="pt-0 pb-4">
           <div className="flex justify-between items-center mb-3">

@@ -58,40 +58,40 @@ export default function ManagerAnalytics() {
     <div className="flex gap-4 w-full">
       {/* Card 1: Team Performance Overview */}
       <div className="w-1/2">
-        <Card className="border-0 shadow-md bg-white">
+        <Card className="border-border shadow-md bg-card">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" style={{ color: '#1C225B' }} />
               <div>
-                <CardTitle className="text-base font-semibold">Team Performance Overview</CardTitle>
-                <CardDescription className="text-xs">Team member scores and completion rates</CardDescription>
+                <CardTitle className="text-base font-semibold text-foreground">Team Performance Overview</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Team member scores and completion rates</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Team KPI Grid */}
             <div className="grid grid-cols-4 gap-2">
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#0f172a', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Avg Score</p>
-                <p className="text-lg font-bold" style={{ color: '#1C225B' }}>82</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Avg Score</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">82</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#1C225B', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Completion</p>
-                <p className="text-lg font-bold text-white">84%</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Completion</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">84%</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#3d4a8f', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Members</p>
-                <p className="text-lg font-bold text-white">8</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Members</p>
+                <p className="text-lg font-bold text-purple-600 dark:text-purple-400">8</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#64748b', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Ranking</p>
-                <p className="text-lg font-bold text-white">Top 15%</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Ranking</p>
+                <p className="text-lg font-bold text-slate-600 dark:text-slate-400">Top 15%</p>
               </div>
             </div>
 
             {/* Individual Team Member Scores Bar Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Individual Member Scores</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Individual Member Scores</p>
               <div className="h-44">
                 <ChartContainer
                   config={{
@@ -115,40 +115,40 @@ export default function ManagerAnalytics() {
 
       {/* Card 2: Project Efficiency Analytics */}
       <div className="w-1/2">
-        <Card className="border-0 shadow-md bg-white">
+        <Card className="border-border shadow-md bg-card">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Briefcase className="h-5 w-5" style={{ color: '#1C225B' }} />
               <div>
-                <CardTitle className="text-base font-semibold">Project Efficiency Analytics</CardTitle>
-                <CardDescription className="text-xs">Project completion and workload metrics</CardDescription>
+                <CardTitle className="text-base font-semibold text-foreground">Project Efficiency Analytics</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Project completion and workload metrics</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Project KPI Grid */}
             <div className="grid grid-cols-4 gap-2">
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#0f172a', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Active</p>
-                <p className="text-lg font-bold" style={{ color: '#1C225B' }}>4</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Active</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">4</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#1C225B', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Completed</p>
-                <p className="text-lg font-bold text-white">1</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Completed</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">1</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#3d4a8f', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Avg Time</p>
-                <p className="text-lg font-bold text-white">18d</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Avg Time</p>
+                <p className="text-lg font-bold text-slate-600 dark:text-slate-400">18d</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#64748b', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Overdue</p>
-                <p className="text-lg font-bold text-white">14</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Overdue</p>
+                <p className="text-lg font-bold text-red-600 dark:text-red-400">14</p>
               </div>
             </div>
 
             {/* Project Completion % Bar Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Project Completion %</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Project Completion %</p>
               <div className="h-32">
                 <ChartContainer
                   config={{
@@ -169,7 +169,7 @@ export default function ManagerAnalytics() {
 
             {/* Overdue Tasks per Project Bar Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Overdue Tasks per Project</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Overdue Tasks per Project</p>
               <div className="h-32">
                 <ChartContainer
                   config={{
@@ -190,7 +190,7 @@ export default function ManagerAnalytics() {
 
             {/* Active vs Completed Projects Trend */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Active vs Completed Projects</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Active vs Completed Projects</p>
               <div className="h-32">
                 <ChartContainer
                   config={{

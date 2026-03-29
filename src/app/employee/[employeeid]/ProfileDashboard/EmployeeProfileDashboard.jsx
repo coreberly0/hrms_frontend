@@ -65,7 +65,7 @@ export default function EmployeeProfileDashboard({ employeeid }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-lg text-muted-foreground">Loading profile...</div>
       </div>
     );
@@ -73,14 +73,14 @@ export default function EmployeeProfileDashboard({ employeeid }) {
 
   if (!emp) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-lg text-muted-foreground">Employee not found</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
 
       {/* Edit Button — top right */}
       <div className="max-w-6xl mx-auto mb-3 flex justify-end">
@@ -94,7 +94,7 @@ export default function EmployeeProfileDashboard({ employeeid }) {
         </Button>
       </div>
 
-      <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+      <div className="max-w-6xl mx-auto bg-card shadow-lg rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
 
         {/* LEFT CONTENT */}
         <div className="lg:col-span-8 p-6 sm:p-8 lg:p-10 space-y-8">
@@ -126,10 +126,10 @@ export default function EmployeeProfileDashboard({ employeeid }) {
         </div>
 
         {/* RIGHT SIDEBAR */}
-        <div className="lg:col-span-4 bg-slate-900 text-white p-6 sm:p-8 flex flex-col items-center text-center space-y-6">
+        <div className="lg:col-span-4 bg-primary text-primary-foreground p-6 sm:p-8 flex flex-col items-center text-center space-y-6">
 
-          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white">
-            <AvatarFallback className="text-3xl font-bold bg-slate-700">
+          <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-primary-foreground">
+            <AvatarFallback className="text-3xl font-bold bg-primary-foreground text-primary">
               {(emp.name || emp.employeeName)?.[0]}
             </AvatarFallback>
           </Avatar>
@@ -138,10 +138,10 @@ export default function EmployeeProfileDashboard({ employeeid }) {
             <h2 className="text-xl sm:text-2xl font-semibold">
               {emp.name || emp.employeeName}
             </h2>
-            <p className="text-slate-300 text-sm mt-1">
+            <p className="text-primary-foreground/80 text-sm mt-1">
               {emp.position || emp.designation || emp.role}
             </p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-primary-foreground/70 mt-1">
               ID: {emp.employee_id || emp.employeeCode}
             </p>
           </div>
@@ -150,9 +150,9 @@ export default function EmployeeProfileDashboard({ employeeid }) {
             {emp.status}
           </Badge>
 
-          <Separator className="bg-slate-700 w-full" />
+          <Separator className="bg-primary-foreground/20 w-full" />
 
-          <div className="text-sm text-slate-300 space-y-2">
+          <div className="text-sm text-primary-foreground/80 space-y-2">
             <p>{emp.department}</p>
             <p>{emp.company_name || emp.companyName}</p>
           </div>
@@ -167,7 +167,7 @@ export default function EmployeeProfileDashboard({ employeeid }) {
 function Section({ title, children }) {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">{title}</h3>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -175,12 +175,12 @@ function Section({ title, children }) {
 
 function Row({ icon: Icon, label, value }) {
   return (
-    <div className="flex justify-between items-center border-b pb-2 text-sm gap-4">
+    <div className="flex justify-between items-center border-b border-border pb-2 text-sm gap-4">
       <div className="flex items-center gap-2 text-muted-foreground">
         {Icon && <Icon className="h-4 w-4" />}
         {label}
       </div>
-      <span className="font-medium text-right break-all">
+      <span className="font-medium text-right break-all text-foreground">
         {value || "-"}
       </span>
     </div>

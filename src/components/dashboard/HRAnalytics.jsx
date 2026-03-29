@@ -17,9 +17,9 @@ export default function HRAnalytics() {
 
   // Task Status Distribution - Donut Chart
   const taskStatusData = [
-    { name: "Completed", value: 72, fill: "#22c55e" },
-    { name: "Pending", value: 18, fill: "#f59e0b" },
-    { name: "Overdue", value: 10, fill: "#ef4444" },
+    { name: "Completed", value: 72, fill: "#1C225B" },
+    { name: "Pending", value: 18, fill: "#3d4a8f" },
+    { name: "Overdue", value: 10, fill: "#64748b" },
   ];
 
   // Monthly Productivity Trend
@@ -64,36 +64,36 @@ export default function HRAnalytics() {
     <div className="flex gap-4 w-full">
       {/* Card 1: Workforce Productivity Index */}
       <div className="w-1/2">
-        <Card className="border-0 shadow-md bg-white">
+        <Card className="border-border shadow-md bg-card">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" style={{ color: '#1C225B' }} />
               <div>
-                <CardTitle className="text-base font-semibold">Workforce Productivity Index</CardTitle>
-                <CardDescription className="text-xs">Organization-wide productivity metrics</CardDescription>
+                <CardTitle className="text-base font-semibold text-foreground">Workforce Productivity Index</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Organization-wide productivity metrics</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* KPI Cards */}
             <div className="grid grid-cols-3 gap-2">
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#0f172a', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Overall Score</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Overall Score</p>
                 <p className="text-xl font-bold" style={{ color: '#1C225B' }}>78</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#1C225B', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Completed</p>
-                <p className="text-xl font-bold text-white">72%</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Completed</p>
+                <p className="text-xl font-bold text-green-600 dark:text-green-400">72%</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#3d4a8f', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Overdue</p>
-                <p className="text-xl font-bold text-white">10%</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Overdue</p>
+                <p className="text-xl font-bold text-red-600 dark:text-red-400">10%</p>
               </div>
             </div>
 
             {/* Department-wise Productivity Bar Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Department-wise Productivity</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Department-wise Productivity</p>
               <div className="h-40">
                 <ChartContainer
                   config={{
@@ -106,7 +106,7 @@ export default function HRAnalytics() {
                     <XAxis dataKey="dept" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} />
                     <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} domain={[0, 100]} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="productivity" fill="#1C225B" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="productivity" fill="#3d4a8f" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ChartContainer>
               </div>
@@ -114,7 +114,7 @@ export default function HRAnalytics() {
 
             {/* Task Status Donut Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Task Status Distribution</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Task Status Distribution</p>
               <div className="h-40 flex items-center justify-center">
                 <ChartContainer config={{}} className="h-full w-full">
                   <PieChart>
@@ -127,7 +127,7 @@ export default function HRAnalytics() {
 
             {/* Monthly Trend */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Monthly Productivity Trend</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Monthly Productivity Trend</p>
               <div className="h-32">
                 <ChartContainer
                   config={{
@@ -151,36 +151,36 @@ export default function HRAnalytics() {
 
       {/* Card 2: Employee Performance Distribution */}
       <div className="w-1/2">
-        <Card className="border-0 shadow-md bg-white">
+        <Card className="border-border shadow-md bg-card">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" style={{ color: '#1C225B' }} />
               <div>
-                <CardTitle className="text-base font-semibold">Performance Distribution</CardTitle>
-                <CardDescription className="text-xs">Employee performance categorization</CardDescription>
+                <CardTitle className="text-base font-semibold text-foreground">Performance Distribution</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">Employee performance categorization</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Performance Category Stats */}
             <div className="grid grid-cols-3 gap-2">
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#0f172a', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">High</p>
-                <p className="text-xl font-bold" style={{ color: '#1C225B' }}>35</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">High</p>
+                <p className="text-xl font-bold text-green-600 dark:text-green-400">35</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#1C225B', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Average</p>
-                <p className="text-xl font-bold text-white">48</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Average</p>
+                <p className="text-xl font-bold text-blue-600 dark:text-blue-400">48</p>
               </div>
-              <div className="p-2 rounded text-center border" style={{ backgroundColor: '#3d4a8f', borderColor: '#1C225B' }}>
-                <p className="text-xs font-medium text-white">Low</p>
-                <p className="text-xl font-bold text-white">17</p>
+              <div className="p-2 rounded text-center border border-border bg-muted/50">
+                <p className="text-xs font-medium text-foreground">Low</p>
+                <p className="text-xl font-bold text-slate-600 dark:text-slate-400">17</p>
               </div>
             </div>
 
             {/* Performance Categories Pie Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Performance Categories</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Performance Categories</p>
               <div className="h-40 flex items-center justify-center">
                 <ChartContainer config={{}} className="h-full w-full">
                   <PieChart>
@@ -193,7 +193,7 @@ export default function HRAnalytics() {
 
             {/* Department-wise Performance Bar Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Department-wise Avg Performance</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Department-wise Avg Performance</p>
               <div className="h-40">
                 <ChartContainer
                   config={{
@@ -214,7 +214,7 @@ export default function HRAnalytics() {
 
             {/* Performance Trend Line Chart */}
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2">Performance Improvement Trend</p>
+              <p className="text-xs font-semibold text-foreground mb-2">Performance Improvement Trend</p>
               <div className="h-32">
                 <ChartContainer
                   config={{

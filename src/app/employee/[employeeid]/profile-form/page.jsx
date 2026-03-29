@@ -80,7 +80,7 @@ const FIELD_OF_STUDY_OPTIONS = [
 const Req = () => <span className="text-rose-500 ml-0.5">*</span>
 
 const FL = ({ children, required }) => (
-  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
     {children}{required && <Req />}
   </p>
 )
@@ -89,11 +89,11 @@ const SI = ({ error, className = "", ...props }) => (
   <>
     <input
       {...props}
-      className={`w-full h-10 px-3 rounded-lg border text-sm text-slate-800 bg-white
+      className={`w-full h-10 px-3 rounded-lg border text-sm text-foreground bg-card
         outline-none transition-all
         focus:ring-2 focus:ring-[#1C225B]/30 focus:border-[#1C225B]
-        ${error ? "border-rose-400 bg-rose-50/50" : "border-slate-200 hover:border-slate-300"}
-        disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed
+        ${error ? "border-rose-400 bg-rose-50/50 dark:bg-rose-950/30" : "border-border hover:border-border/80"}
+        disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed
         ${className}`}
     />
     {error && <p className="text-[11px] text-rose-500 mt-1">{error}</p>}
@@ -104,11 +104,11 @@ const SS = ({ error, className = "", children, ...props }) => (
   <>
     <select
       {...props}
-      className={`w-full h-10 px-3 rounded-lg border text-sm text-slate-800 bg-white
+      className={`w-full h-10 px-3 rounded-lg border text-sm text-foreground bg-card
         outline-none transition-all cursor-pointer
         focus:ring-2 focus:ring-[#1C225B]/30 focus:border-[#1C225B]
-        ${error ? "border-rose-400 bg-rose-50/50" : "border-slate-200 hover:border-slate-300"}
-        disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed
+        ${error ? "border-rose-400 bg-rose-50/50 dark:bg-rose-950/30" : "border-border hover:border-border/80"}
+        disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed
         ${className}`}
     >
       {children}
@@ -118,10 +118,10 @@ const SS = ({ error, className = "", children, ...props }) => (
 )
 
 const Card = ({ icon, title, children }) => (
-  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-    <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[#1C225B]/5 to-transparent">
+  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+    <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-muted/50">
       <span className="text-lg">{icon}</span>
-      <h2 className="text-sm font-extrabold text-slate-900 tracking-tight uppercase">{title}</h2>
+      <h2 className="text-sm font-extrabold text-foreground tracking-tight uppercase">{title}</h2>
     </div>
     <div className="p-4">{children}</div>
   </div>
@@ -129,7 +129,7 @@ const Card = ({ icon, title, children }) => (
 
 const AddressSection = ({ prefix, label, reg, errs }) => (
   <div>
-    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{label}</p>
+    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">{label}</p>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="md:col-span-2">
         <FL required>Address Line 1</FL>
@@ -199,7 +199,7 @@ export default function EmployeeProfilePage() {
 
   // useFieldArray via a local ref since we can't import useFieldArray here without react-hook-form
   const [educations, setEducations] = useState([
-    { id: 1, degree: "", institution: "", fieldOfStudy: "", yearOfPassing: "", cgpa: "" }
+    { id: 1, degree: "", institution: "", fieldOfStudy: "", yearOfPassing: "", cgpa: "", certificate: null, certificateName: "" }
   ])
 
   const maritalStatus = watch("maritalStatus")
@@ -247,7 +247,22 @@ export default function EmployeeProfilePage() {
   }
 
   const addEducation = () => {
-    setEducations(prev => [...prev, { id: Date.now(), degree: "", institution: "", fieldOfStudy: "", yearOfPassing: "", cgpa: "" }])
+    setEducations(prev => [...prev, { id: Date.now(), degree: "", institution: "", fieldOfStudy: "", yearOfPassing: "", cgpa: "", certificate: null, certificateName: "" }])
+  }
+
+  const handleCertificateUpload = (e, eduId) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64 = event.target?.result
+      setEducations(prev => prev.map(ed => 
+        ed.id === eduId 
+          ? { ...ed, certificate: base64, certificateName: file.name } 
+          : ed
+      ))
+    }
+    reader.readAsDataURL(file)
   }
 
   const removeEducation = (id) => {
@@ -271,7 +286,7 @@ export default function EmployeeProfilePage() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen w-full bg-[#F4F6FB]">
+    <div className="min-h-screen w-full bg-background">
       <EmpSidebar />
 
       <div className="flex-1 p-4 md:p-6 space-y-5 pb-16">
@@ -279,15 +294,15 @@ export default function EmployeeProfilePage() {
         {/* Header */}
         <div className="flex items-start justify-between pt-2">
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
               {isEditMode ? "Edit Profile" : "Complete Your Profile"}
             </h1>
-            <p className="text-xs text-slate-400 mt-1">Fields marked <span className="text-rose-500">*</span> are mandatory</p>
+            <p className="text-xs text-muted-foreground mt-1">Fields marked <span className="text-rose-500">*</span> are mandatory</p>
           </div>
           {isEditMode && (
             <button
               onClick={() => router.push(`/employee/${employeeid}/ProfileDashboard`)}
-              className="text-sm px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-white hover:shadow-sm transition-all"
+              className="text-sm px-4 py-2 rounded-xl border border-border text-muted-foreground hover:bg-muted hover:shadow-sm transition-all"
             >
               ← Back
             </button>
@@ -295,7 +310,7 @@ export default function EmployeeProfilePage() {
         </div>
 
         {!isEditMode && (
-          <div className="bg-blue-50 border border-blue-100 rounded-xl px-5 py-3 text-sm text-blue-700 flex gap-2 items-start">
+          <div className="bg-blue-950/20 dark:bg-blue-900/30 border border-blue-500/30 rounded-xl px-5 py-3 text-sm text-blue-600 dark:text-blue-400 flex gap-2 items-start">
             <span className="mt-0.5">👋</span>
             <span>Welcome! Please fill in all your profile details to get started. All fields are mandatory.</span>
           </div>
@@ -308,11 +323,11 @@ export default function EmployeeProfilePage() {
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden cursor-pointer hover:border-[#1C225B] transition-colors flex-shrink-0 flex items-center justify-center"
+                className="w-28 h-28 rounded-2xl border-2 border-dashed border-border bg-muted overflow-hidden cursor-pointer hover:border-[#1C225B] transition-colors flex-shrink-0 flex items-center justify-center"
               >
                 {profileImagePreview
                   ? <img src={profileImagePreview} alt="Profile" className="w-full h-full object-cover" />
-                  : <div className="text-center text-slate-400 text-xs p-2"><div className="text-3xl mb-1">📷</div><div>Click to upload</div></div>
+                  : <div className="text-center text-muted-foreground text-xs p-2"><div className="text-3xl mb-1">📷</div><div>Click to upload</div></div>
                 }
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -351,7 +366,7 @@ export default function EmployeeProfilePage() {
               </div>
               <div>
                 <FL>Age (Auto-calculated)</FL>
-                <div className="h-10 px-3 flex items-center rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-500 font-semibold">
+                <div className="h-10 px-3 flex items-center rounded-lg border border-border bg-muted text-sm text-muted-foreground font-semibold">
                   {age ? `${age} years` : <span className="text-slate-300">—</span>}
                 </div>
               </div>
@@ -379,7 +394,7 @@ export default function EmployeeProfilePage() {
 
               {/* Marital Status block */}
               <div className="md:col-span-2">
-                <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/60">
+                <div className="border border-border rounded-xl p-5 bg-muted/50">
                   <div className="flex items-center justify-between mb-3">
                     <FL required>Marital Status</FL>
                     {maritalLocked && (
@@ -390,7 +405,7 @@ export default function EmployeeProfilePage() {
                   </div>
 
                   {maritalLocked ? (
-                    <div className="h-10 px-3 flex items-center rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-600">
+                    <div className="h-10 px-3 flex items-center rounded-lg border border-border bg-card text-sm font-semibold text-muted-foreground">
                       {watch("maritalStatus") === "yes" ? "Married" : "Unmarried"}
                     </div>
                   ) : (
@@ -524,7 +539,7 @@ export default function EmployeeProfilePage() {
               <div className="md:col-span-2">
                 <FL required>Skill Set</FL>
                 <p className="text-[11px] text-slate-400 -mt-1 mb-2">Click to select all that apply</p>
-                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50 max-h-56 overflow-y-auto">
+                <div className="border border-border rounded-xl p-3 bg-muted max-h-56 overflow-y-auto">
                   <div className="flex flex-wrap gap-2">
                     {SKILL_SET_OPTIONS.map(skill => (
                       <button
@@ -534,7 +549,7 @@ export default function EmployeeProfilePage() {
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                           selectedSkills.includes(skill)
                             ? "bg-[#1C225B] text-white border-[#1C225B] shadow-sm"
-                            : "bg-white text-slate-600 border-slate-200 hover:border-[#1C225B]/40 hover:text-[#1C225B]"
+                            : "bg-card text-muted-foreground border-border hover:border-[#1C225B]/40 hover:text-[#1C225B]"
                         }`}
                       >
                         {selectedSkills.includes(skill) ? "✓ " : ""}{skill}
@@ -557,7 +572,7 @@ export default function EmployeeProfilePage() {
           <Card icon="🎓" title="Education Details">
             <div className="space-y-4">
               {educations.map((edu, index) => (
-                <div key={edu.id} className="border border-slate-200 rounded-xl p-5 bg-slate-50/60 relative">
+                <div key={edu.id} className="border border-border rounded-xl p-5 bg-muted/50 relative">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                       Education #{index + 1}
@@ -624,6 +639,21 @@ export default function EmployeeProfilePage() {
                         onChange={e => setEducations(prev => prev.map(ed => ed.id === edu.id ? { ...ed, cgpa: e.target.value } : ed))}
                         placeholder="e.g. 8.5 CGPA or 85%"
                       />
+                    </div>
+
+                    <div>
+                      <FL required>Certificate / Degree Document</FL>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={(e) => handleCertificateUpload(e, edu.id)}
+                        className="w-full h-10 px-3 rounded-lg border border-dashed border-border hover:border-[#1C225B]/50 bg-muted/30 hover:bg-muted/50 text-sm text-muted-foreground cursor-pointer transition-all file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#1C225B] file:text-white file:cursor-pointer"
+                      />
+                      {edu.certificateName && (
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-1.5 flex items-center gap-1">
+                          ✓ {edu.certificateName}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

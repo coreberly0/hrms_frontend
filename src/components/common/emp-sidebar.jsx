@@ -7,10 +7,12 @@ import {
   LayoutDashboard,
   CalendarCheck,
   FolderKanban,
+  FileText,
   LogOut,
   User,
   Users,
   MessageSquare,
+  AlertCircle,
 } from "lucide-react";
 
 import { useSidebar } from "@/components/ui/sidebar";
@@ -31,8 +33,17 @@ export function EmpSidebar() {
   const empId = pathname.split("/")[2];
 
   const [role, setRole] = useState(null);
+  const [policyMenuOpen, setPolicyMenuOpen] = useState(false);
 
   const { toggleSidebar } = useSidebar();
+
+  const policyItems = [
+    { key: "attendance-working-hours", label: "Attendance & Working Hours", href: `/employee/${empId}/Policies/attendance-working-hours` },
+    { key: "leave", label: "Leave", href: `/employee/${empId}/Policies/leave` },
+    { key: "payroll-salary", label: "Payroll / Salary", href: `/employee/${empId}/Policies/payroll-salary` },
+    { key: "it-security", label: "IT & Security", href: `/employee/${empId}/Policies/it-security` },
+    { key: "exit-resignation", label: "Exit & Resignation", href: `/employee/${empId}/Policies/exit-resignation` },
+  ];
 
   useEffect(() => {
     try {
@@ -43,7 +54,18 @@ export function EmpSidebar() {
     }
   }, []);
 
+  useEffect(() => {
+    if (pathname.startsWith(`/employee/${empId}/Policies`)) {
+      setPolicyMenuOpen(true);
+    }
+  }, [pathname, empId]);
+
   if (!empId || role === null) return null;
+
+  const navButtonClass =
+    "flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 data-[active=true]:bg-[#3d4a8f] data-[active=true]:text-white transition-colors duration-200 group-data-[collapsible=icon]:justify-center";
+  const navLabelClass =
+    "group-data-[collapsible=icon]:hidden text-[15px] font-semibold tracking-wide";
 
   const handleLogout = () => {
     localStorage.clear();
@@ -67,20 +89,20 @@ export function EmpSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="!bg-[#0b1220] text-white border-r border-slate-800 shadow-xl"
+      className="bg-[#0b1220]! text-white font-sans border-r border-slate-800 shadow-xl"
     >
 
       {/* HEADER */}
-      <SidebarHeader className="!bg-[#0b1220] px-4 py-4 border-b border-slate-800">
+      <SidebarHeader className="bg-[#0b1220]! px-4 py-4 border-b border-slate-800">
 
         <div className="flex items-center gap-3">
 
-          <LayoutDashboard className="h-6 w-6 text-blue-500" />
+          <LayoutDashboard className="h-6 w-6 text-blue-800" />
 
           {/* TEXT */}
           <div className="group-data-[collapsible=icon]:hidden">
-            <div className="text-xl font-bold">
-              <span className="text-blue-500">HRMS</span> Panel
+            <div className="text-2xl font-extrabold tracking-tight">
+              <span className="text-blue-800">HRMS</span> Panel
             </div>
 
             {/* ✅ ROLE CHIP */}
@@ -99,18 +121,18 @@ export function EmpSidebar() {
       </SidebarHeader>
 
       {/* CONTENT */}
-      <SidebarContent className="!bg-[#0b1220] px-2 py-4">
+      <SidebarContent className="bg-[#0b1220]! px-2 py-4">
         <SidebarMenu className="space-y-2">
 
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname === `/employee/${empId}`}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className={navButtonClass}
             >
               <Link href={`/employee/${empId}`}>
-                <LayoutDashboard className="h-6 w-6" />
-                <span className="group-data-[collapsible=icon]:hidden">
+                <LayoutDashboard className="h-5 w-5" />
+                <span className={navLabelClass}>
                   Dashboard
                 </span>
               </Link>
@@ -121,11 +143,11 @@ export function EmpSidebar() {
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/attendance`)}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className={navButtonClass}
             >
               <Link href={`/employee/${empId}/attendance`}>
-                <CalendarCheck className="h-6 w-6" />
-                <span className="group-data-[collapsible=icon]:hidden">
+                <CalendarCheck className="h-5 w-5" />
+                <span className={navLabelClass}>
                   Attendance
                 </span>
               </Link>
@@ -137,11 +159,11 @@ export function EmpSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={pathname.includes("employeeList")}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+                className={navButtonClass}
               >
                 <Link href={`/employee/${empId}/employeeList`}>
-                  <Users className="h-6 w-6" />
-                  <span className="group-data-[collapsible=icon]:hidden">
+                  <Users className="h-5 w-5" />
+                  <span className={navLabelClass}>
                     Employee List
                   </span>
                 </Link>
@@ -154,11 +176,11 @@ export function EmpSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={pathname.includes("team-member")}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+                className={navButtonClass}
               >
                 <Link href={`/employee/${empId}/team-member`}>
-                  <Users className="h-6 w-6" />
-                  <span className="group-data-[collapsible=icon]:hidden">
+                  <Users className="h-5 w-5" />
+                  <span className={navLabelClass}>
                     Team Members
                   </span>
                 </Link>
@@ -170,31 +192,78 @@ export function EmpSidebar() {
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/projects`)}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className={navButtonClass}
             >
               <Link href={`/employee/${empId}/projects`}>
-                <FolderKanban className="h-6 w-6" />
-                <span className="group-data-[collapsible=icon]:hidden">
+                <FolderKanban className="h-5 w-5" />
+                <span className={navLabelClass}>
                   Projects
                 </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => setPolicyMenuOpen((prev) => !prev)}
+              isActive={pathname.startsWith(`/employee/${empId}/Policies`)}
+              className={navButtonClass}
+            >
+              <FileText className="h-5 w-5" />
+              <span className={navLabelClass}>Policies</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {policyMenuOpen && (
+            <div className="group-data-[collapsible=icon]:hidden ml-4 mt-1 mb-2 space-y-1">
+              {policyItems.map((item) => {
+                const isActivePolicy = pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    className={`block rounded-lg px-3 py-2 text-[13px] transition-colors ${
+                      isActivePolicy
+                        ? "bg-[#3d4a8f] text-white"
+                        : "text-slate-300 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(`/employee/${empId}/grievances`)}
+              className={navButtonClass}
+            >
+              <Link href={`/employee/${empId}/grievances`}>
+                <AlertCircle className="h-5 w-5" />
+                <span className={navLabelClass}>
+                  Grievances
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
 
           {/* CHAT */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname.startsWith(`/employee/${empId}/chat`)}
-              className="rounded-lg bg-white/5 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 data-[active=true]:bg-blue-600"
+              className={navButtonClass}
             >
               <Link
                 href={`/employee/${empId}/chat`}
-                className="flex items-center gap-3 px-4 py-2"
+                className="flex items-center gap-3"
               >
                 <MessageSquare className="h-5 w-5" />
-                Messages
+                <span className={navLabelClass}>Messages</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -205,11 +274,11 @@ export function EmpSidebar() {
             <SidebarMenuButton
               asChild
               isActive={pathname.includes("ProfileDashboard")}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 hover:bg-white data-[active=true]:bg-blue-600 group-data-[collapsible=icon]:justify-center"
+              className={navButtonClass}
             >
               <Link href={`/employee/${empId}/ProfileDashboard`}>
-                <User className="h-6 w-6" />
-                <span className="group-data-[collapsible=icon]:hidden">
+                <User className="h-5 w-5" />
+                <span className={navLabelClass}>
                   Profile
                 </span>
               </Link>
@@ -220,12 +289,12 @@ export function EmpSidebar() {
       </SidebarContent>
 
       {/* FOOTER */}
-      <SidebarFooter className="!bg-[#0b1220] border-t border-slate-800 p-2">
+      <SidebarFooter className="bg-[#0b1220]! border-t border-slate-800 p-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-500/20 text-red-400 hover:text-red-300 group-data-[collapsible=icon]:justify-center"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-500/20 text-red-400 hover:text-red-300 group-data-[collapsible=icon]:justify-center"
             >
               <LogOut className="h-5 w-5" />
               <span className="group-data-[collapsible=icon]:hidden">
