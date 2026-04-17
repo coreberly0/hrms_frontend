@@ -1,16 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getEmployeeById } from "@/services/employee";
+import { getLeaveBalance } from "@/services/leaveService";
 
 import HRAnalytics from "@/components/dashboard/HRAnalytics";
 import ManagerAnalytics from "@/components/dashboard/ManagerAnalytics";
 import AttendanceCheck from "./AttendanceCheck";
 
-import { PieChart, Pie } from "recharts";
+import {
+  PieChart,
+  Pie,
+  ResponsiveContainer,
+  Cell
+} from "recharts";
 
 import {
   ChartContainer,
@@ -18,65 +24,60 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart";
 
+import { Wallet, CalendarDays } from "lucide-react";
+
 export default function EmployeeDashboard({ employeeid }) {
 
-  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [employee, setEmployee] = useState(null);
+  const [leaveBalance, setLeaveBalance] = useState({});
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const fetchEmployee = async () => {
+    const load = async () => {
       try {
-        const data = await getEmployeeById(employeeid);
-        if (data) setEmployee(data);
-      } catch (err) {
-        console.error(err);
+        const emp = await getEmployeeById(employeeid);
+        setEmployee(emp);
+
+        const balance = await getLeaveBalance();
+        setLeaveBalance(balance || {});
       } finally {
         setLoading(false);
       }
     };
 
-    if (mounted) fetchEmployee();
-  }, [employeeid, mounted]);
+    load();
+  }, [employeeid]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
+    const t = setInterval(() => setCurrentDateTime(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
-  if (!mounted || loading) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[70vh]">
-        <Spinner className="h-10 w-10" />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Spinner className="h-8 w-8" />
       </div>
     );
   }
 
   const role = employee?.role?.toLowerCase()?.trim();
-  const employeeName = employee?.employeeName || employee?.name || "";
-  const dayLabel = currentDateTime.toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-  const dateLabel = currentDateTime.toLocaleDateString("en-US", {
-    month: "long",
+  const name = employee?.employeeName || employee?.name || "";
+
+  const day = currentDateTime.toLocaleDateString("en-US", { weekday: "long" });
+  const date = currentDateTime.toLocaleDateString("en-US", {
+    month: "short",
     day: "numeric",
-    year: "numeric",
+    year: "numeric"
   });
-  const timeLabel = currentDateTime.toLocaleTimeString("en-US", {
+
+  const time = currentDateTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true,
+    hour12: true
   });
-  const dateTimeLabel = `${dayLabel}, ${dateLabel} ${timeLabel}`;
 
   const chartData = [
     { name: "Completed", value: 10, fill: "#1C225B" },
@@ -85,128 +86,147 @@ export default function EmployeeDashboard({ employeeid }) {
   ];
 
   const chartConfig = {
-    value: {
-      label: "Tasks",
-      color: "hsl(var(--chart-1))"
-    }
+    value: { label: "Tasks" }
   };
 
   return (
-    <div className="px-4 pb-4 pt-1 md:px-6 md:pb-6 md:pt-1 space-y-4 bg-background min-h-screen">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-6 py-6 space-y-6">
 
-      {/* Top Section */}
+      {/* HEADER (CLEAN + BALANCED) */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between border-b pb-4">
 
-      <div className="space-y-2">
-
-        {/* Welcome Header */}
-
-        <div className="flex w-full flex-col gap-2 px-1 py-2 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              Welcome back👋, {employeeName}
-            </h2>
-            <p className="mt-1 text-muted-foreground">Here&apos;s what&apos;s happening today.</p>
-          </div>
-
-          <div className="shrink-0 text-left sm:text-right flex flex-col gap-2 items-end">
-            <p className="text-sm font-semibold text-foreground">{dayLabel}</p>
-            <p className="text-sm text-muted-foreground">{dateLabel}</p>
-          </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            Welcome back, {name}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {role === "hr"
+              ? "HR Overview Dashboard"
+              : role === "manager"
+              ? "Manager Control Dashboard"
+              : "Employee Workspace"}
+          </p>
         </div>
 
-        {/* Attendance & Announcement */}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Attendance Card */}
-          <div className="min-w-0 lg:h-[300px]">
-            <AttendanceCheck />
-          </div>
-
-          {/* Announcement Card */}
-          <Card className="shadow-md flex flex-col lg:h-[300px]">
-            <CardContent className="px-4 pt-2 pb-4 flex h-full min-h-0 flex-col">
-              <h3 className="text-lg font-semibold mb-3 text-foreground">Announcements</h3>
-              <ScrollArea className="min-h-0 flex-1 pr-4">
-                <div className="space-y-3 pb-2">
-                  <div className="border-l-4 border-blue-500 pl-3 py-2 dark:border-blue-400">
-                    <div className="flex items-start justify-between">
-                      <p className="text-xs font-semibold text-blue-600 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/30 px-2 py-1 rounded">Info</p>
-                    </div>
-                    <p className="text-sm mt-1 text-foreground">Server maintenance scheduled for Sunday.</p>
-                    <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
-                  </div>
-
-                  <div className="border-l-4 border-green-500 pl-3 py-2 dark:border-green-400">
-                    <div className="flex items-start justify-between">
-                      <p className="text-xs font-semibold text-green-600 bg-green-100 dark:text-green-200 dark:bg-green-900/30 px-2 py-1 rounded">New</p>
-                    </div>
-                    <p className="text-sm mt-1 text-foreground">Policy update: Annual Leave carry-over enabled.</p>
-                    <p className="text-xs text-muted-foreground mt-1">5 hours ago</p>
-                  </div>
-
-                  <div className="border-l-4 border-orange-500 pl-3 py-2 dark:border-orange-400">
-                    <div className="flex items-start justify-between">
-                      <p className="text-xs font-semibold text-orange-600 bg-orange-100 dark:text-orange-200 dark:bg-orange-900/30 px-2 py-1 rounded">Alert</p>
-                    </div>
-                    <p className="text-sm mt-1 text-foreground">Team standup meeting at 3:00 PM today.</p>
-                    <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
-                  </div>
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+        <div className="text-sm text-right text-muted-foreground mt-2 md:mt-0">
+          <div className="font-medium text-foreground">{day}</div>
+          <div>{date}</div>
+          <div>{time}</div>
         </div>
 
       </div>
 
-      {/* Chart Section */}
+      {/* LEAVE BALANCE (PRIMARY KPI SECTION) */}
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-row items-center gap-2">
+          <Wallet className="h-5 w-5" />
+          <CardTitle className="text-base">Leave Balance</CardTitle>
+        </CardHeader>
 
-      <Card className="shadow-md">
-
-        <CardContent className="p-6">
-
-          <h3 className="text-lg font-semibold mb-4 text-foreground">
-            Task Productivity
-          </h3>
-
-          {/* FIXED CHART CONTAINER */}
-
-          <div className="w-full min-w-0 h-[260px]">
-
-            <ChartContainer
-              config={chartConfig}
-              className="w-full h-full"
-            >
-
-              <PieChart width={400} height={300}>
-
-                <Pie
-                  data={chartData}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={60}
-                  outerRadius={100}
-                />
-
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-
-              </PieChart>
-
-            </ChartContainer>
-
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Object.entries(leaveBalance).map(([key, value]) => (
+              <div
+                key={key}
+                className="border rounded-lg p-4 text-center bg-white dark:bg-slate-900"
+              >
+                <CalendarDays className="mx-auto mb-1 h-4 w-4 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground uppercase">
+                  {key}
+                </p>
+                <p className="text-xl font-semibold">{value}</p>
+              </div>
+            ))}
           </div>
-
         </CardContent>
-
       </Card>
 
-      {/* Role Based Analytics */}
+      {/* KPI ROW (CLEAN ALIGNMENT) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-      {role === "hr" && <HRAnalytics />}
-      {role === "manager" && <ManagerAnalytics />}
+        <Card className="shadow-sm">
+          <CardContent className="p-5 text-center">
+            <p className="text-sm text-muted-foreground">Total Tasks</p>
+            <p className="text-2xl font-semibold">15</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-5 text-center">
+            <p className="text-sm text-muted-foreground">Completed</p>
+            <p className="text-2xl font-semibold text-green-600">10</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-5 text-center">
+            <p className="text-sm text-muted-foreground">Pending</p>
+            <p className="text-2xl font-semibold text-orange-500">5</p>
+          </CardContent>
+        </Card>
+
+      </div>
+
+      {/* MAIN CONTENT GRID (BALANCED FLOW) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ATTENDANCE */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base">Attendance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AttendanceCheck />
+          </CardContent>
+        </Card>
+
+        {/* ANNOUNCEMENTS */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base">Announcements</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[220px] pr-2">
+              <div className="space-y-3 text-sm">
+                <p>Server maintenance Sunday</p>
+                <p>Leave policy updated</p>
+                <p>Meeting at 3 PM</p>
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* ANALYTICS */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base">Task Analytics</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="h-[220px]">
+              <ChartContainer config={chartConfig} className="w-full h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={chartData} dataKey="value" outerRadius={80}>
+                      {chartData.map((e, i) => (
+                        <Cell key={i} fill={e.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
+
+      {/* ROLE BASED SECTION (BOTTOM LAYER) */}
+      <div className="pt-2">
+        {role === "hr" && <HRAnalytics />}
+        {role === "manager" && <ManagerAnalytics />}
+      </div>
 
     </div>
   );
